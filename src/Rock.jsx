@@ -41,27 +41,18 @@ export default function Rock({ reflection = false }) {
   const allProjections = useTexture(rocks.map((r) => `${base}${r.projection}`));
 
   const baseOpacity = reflection ? 0.25 : 1;
-  const { scale: rScale, position: rPosition } = useResponsive();
+  const { scale: rScale, offset } = useResponsive();
   const targetScale = useRef(rScale);
-  const targetPos = useRef(rPosition);
   targetScale.current = rScale;
-  targetPos.current = rPosition;
 
   useFrame(({ clock }) => {
     const mesh = meshRef.current;
 
-    // Smooth lerp toward responsive targets
-    const s = reflection ? targetScale.current : targetScale.current;
+    // Smooth lerp toward responsive scale
+    const s = targetScale.current;
     mesh.scale.x += (s - mesh.scale.x) * 0.05;
     mesh.scale.y += ((reflection ? -s : s) - mesh.scale.y) * 0.05;
     mesh.scale.z += (s - mesh.scale.z) * 0.05;
-
-    const ty = reflection
-      ? targetPos.current[1] - 3
-      : targetPos.current[1];
-    mesh.position.x += (targetPos.current[0] - mesh.position.x) * 0.05;
-    mesh.position.y += (ty - mesh.position.y) * 0.05;
-    mesh.position.z += (targetPos.current[2] - mesh.position.z) * 0.05;
 
     mesh.rotation.y += 0.003;
     matRef.current.uTime = clock.getElapsedTime();
@@ -92,7 +83,7 @@ export default function Rock({ reflection = false }) {
     <mesh
       ref={meshRef}
       geometry={geometry}
-      position={reflection ? [rPosition[0], rPosition[1] - 3, rPosition[2]] : rPosition}
+      position={reflection ? [0, -2.5, 0] : [0, 0.5, 0]}
       scale={reflection ? [rScale, -rScale, rScale] : [rScale, rScale, rScale]}
       rotation={[0, 0, 0]}
       renderOrder={reflection ? 0 : 2}
@@ -106,6 +97,7 @@ export default function Rock({ reflection = false }) {
         uProgress={0}
         uTime={0}
         uOpacity={baseOpacity}
+        uOffset={offset}
         transparent
         depthWrite={!reflection}
       />
