@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import Rock from "./Rock";
+import Flowers from "./Flowers";
 import Environment from "./Environment";
 import { useStore } from "./store";
 import { useResponsive } from "./useResponsive";
@@ -72,6 +73,8 @@ function SceneGroup({ children }) {
 }
 
 function App() {
+  const rockMeshRef = useRef();
+
   return (
     <div id="app">
       <Canvas
@@ -85,7 +88,8 @@ function App() {
         <directionalLight position={[5, 5, 5]} intensity={2} />
         <directionalLight position={[-5, 3, -5]} intensity={1} />
         <SceneGroup>
-          <Rock />
+          <Rock meshRefOut={rockMeshRef} />
+          <Flowers rockRef={rockMeshRef} />
           <Rock reflection />
           <Environment />
         </SceneGroup>

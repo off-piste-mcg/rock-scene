@@ -8,7 +8,7 @@ import { useResponsive } from "./useResponsive";
 import gsap from "gsap";
 import "./GrowMaterial";
 
-export default function Rock({ reflection = false }) {
+export default function Rock({ reflection = false, meshRefOut }) {
   const matRef = useRef();
   const meshRef = useRef();
   const { activeIndex, rocks, assetBaseUrl } = useStore();
@@ -55,6 +55,7 @@ export default function Rock({ reflection = false }) {
     mesh.scale.z += (s - mesh.scale.z) * 0.05;
 
     mesh.rotation.y += 0.003;
+    if (meshRefOut) meshRefOut.current = mesh;
     matRef.current.uTime = clock.getElapsedTime();
 
     if (prevIndex.current !== activeIndex && !transitioning.current) {
