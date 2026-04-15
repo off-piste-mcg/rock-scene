@@ -31,11 +31,12 @@ function mount(target, options = {}) {
   );
 }
 
-// Auto-mount only on localhost (for dev)
-if (window.location.hostname === "localhost") {
-  const el = document.getElementById("rock-scene") || document.getElementById("root");
-  if (el) mount(el);
+// Auto-mount: look for #rock-scene or #root
+const el = document.getElementById("rock-scene") || document.getElementById("root");
+if (el) {
+  const assetBaseUrl = el.getAttribute("data-asset-base") || "";
+  mount(el, { assetBaseUrl });
 }
 
-// Expose globally for Webflow embed
+// Also expose globally in case someone wants to mount manually
 export { mount };
