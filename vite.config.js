@@ -1,8 +1,17 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    viteStaticCopy({
+      targets: [
+        { src: 'public/models/*', dest: 'models' },
+        { src: 'public/textures/*', dest: 'textures' },
+      ],
+    }),
+  ],
   build: {
     lib: {
       entry: 'src/main.jsx',
@@ -12,7 +21,6 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        // single file, no code splitting
         inlineDynamicImports: true,
       },
     },
