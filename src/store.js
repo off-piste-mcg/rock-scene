@@ -14,12 +14,12 @@ const rocks = [
 ];
 
 const defaultResponsive = {
-  1920: { scale: 1, cameraZ: 6, offset: [-1.5, 0, 0] },
-  1440: { scale: 1, cameraZ: 6, offset: [-1.2, 0, 0] },
-  1024: { scale: 0.9, cameraZ: 6.5, offset: [-0.5, 0, 0] },
-  768: { scale: 0.75, cameraZ: 7, offset: [0, 0, 0] },
-  480: { scale: 0.6, cameraZ: 8, offset: [0, 0, 0] },
-  0: { scale: 0.5, cameraZ: 9, offset: [0, 0, 0] },
+  1920: { scale: 1.5, cameraZ: 6, offset: [-1.5, 0, 0] },
+  1440: { scale: 1.5, cameraZ: 6, offset: [-1.2, 0, 0] },
+  1024: { scale: 1.35, cameraZ: 6.5, offset: [-0.5, 0, 0] },
+  768: { scale: 1.1, cameraZ: 7, offset: [0, 0, 0] },
+  480: { scale: 0.9, cameraZ: 8, offset: [0, 0, 0] },
+  0: { scale: 0.75, cameraZ: 9, offset: [0, 0, 0] },
 };
 
 export const useStore = create((set) => ({

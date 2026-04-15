@@ -83,7 +83,7 @@ export default function Rock({ reflection = false }) {
     <mesh
       ref={meshRef}
       geometry={geometry}
-      position={reflection ? [0, -2.5, 0] : [0, 0.5, 0]}
+      position={reflection ? [0, -3.5, 0] : [0, 0.5, 0]}
       scale={reflection ? [rScale, -rScale, rScale] : [rScale, rScale, rScale]}
       rotation={[0, 0, 0]}
       renderOrder={reflection ? 0 : 2}

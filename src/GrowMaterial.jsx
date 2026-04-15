@@ -143,7 +143,7 @@ const GrowMaterial = shaderMaterial(
 
       // --- lightmask projection with glitch ---
       vec3 localWorldPos = vWorldPos - uOffset;
-      vec2 projUv = localWorldPos.xy * 0.6 + vec2(0.5, 0.25);
+      vec2 projUv = localWorldPos.xy * 0.4 + vec2(0.4, 0.3);
 
       // glitch: random horizontal shifts per scanline
       float scanline = floor(projUv.y * 40.0);
