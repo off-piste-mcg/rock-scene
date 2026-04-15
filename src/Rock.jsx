@@ -6,31 +6,31 @@ import { useStore } from "./store";
 import gsap from "gsap";
 import "./GrowMaterial";
 
-const texturePaths = [
-  "/textures/tmc_off_piste_black rock 4096x4096 albedo.png",
-  "/textures/tmc_off_piste_black rock 4096x4096 beauty.png",
-  "/textures/tmc_off_piste_black rock 4096x4096 normals.png",
-];
-
 export default function Rock({ reflection = false }) {
   const matRef = useRef();
   const meshRef = useRef();
-  const { activeIndex } = useStore();
+  const { activeIndex, assetBaseUrl } = useStore();
   const prevIndex = useRef(activeIndex);
   const transitioning = useRef(false);
 
-  const gltf = useLoader(GLTFLoader, "/models/rock.gltf");
+  const base = assetBaseUrl;
+  const gltf = useLoader(GLTFLoader, `${base}/models/rock.gltf`);
   let geometry = null;
   gltf.scene.traverse((child) => {
     if (child.isMesh && !geometry) geometry = child.geometry;
   });
 
+  const texturePaths = [
+    `${base}/textures/tmc_off_piste_black rock 4096x4096 albedo.png`,
+    `${base}/textures/tmc_off_piste_black rock 4096x4096 beauty.png`,
+    `${base}/textures/tmc_off_piste_black rock 4096x4096 normals.png`,
+  ];
   const textures = useTexture(texturePaths);
   textures.forEach((t) => {
     t.flipY = false;
     t.needsUpdate = true;
   });
-  const lightmask = useTexture("/textures/lightmask.png");
+  const lightmask = useTexture(`${base}/textures/lightmask.png`);
   const baseOpacity = reflection ? 0.25 : 1;
 
   useFrame(() => {

@@ -9,5 +9,7 @@ const states = [
 export const useStore = create((set) => ({
   states,
   activeIndex: 0,
+  assetBaseUrl: "",
   setActiveIndex: (index) => set({ activeIndex: index }),
+  setAssetBaseUrl: (url) => set({ assetBaseUrl: url }),
 }));
