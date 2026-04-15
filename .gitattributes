@@ -1,2 +1,0 @@
-public/models/*.gltf filter=lfs diff=lfs merge=lfs -text
-public/textures/*.png filter=lfs diff=lfs merge=lfs -text
