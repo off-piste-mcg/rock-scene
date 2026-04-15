@@ -31,10 +31,20 @@ function mount(target, options = {}) {
   );
 }
 
+// Detect asset base URL from the script's own src (works without any config)
+function detectAssetBase() {
+  const script = document.querySelector('script[src*="rock-scene"]');
+  if (script) {
+    const url = new URL(script.src);
+    return url.origin;
+  }
+  return "";
+}
+
 // Auto-mount: look for #rock-scene or #root
 const el = document.getElementById("rock-scene") || document.getElementById("root");
 if (el) {
-  const assetBaseUrl = el.getAttribute("data-asset-base") || "";
+  const assetBaseUrl = el.getAttribute("data-asset-base") || detectAssetBase();
   mount(el, { assetBaseUrl });
 }
 
