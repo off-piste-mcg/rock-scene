@@ -9,7 +9,7 @@ import "./App.css";
 
 const isDev = window.location.hostname === "localhost";
 
-const NAV_MAP = { entrance: 0, "1": 1, "2": 2, "3": 3 };
+const NAV_MAP = { entrance: 1, "1": 1, "2": 2, "3": 3 };
 
 function NavListener() {
   const setActiveIndex = useStore((s) => s.setActiveIndex);
