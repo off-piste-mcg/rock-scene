@@ -31,9 +31,10 @@ function mount(target, options = {}) {
   );
 }
 
-// Auto-mount if #rock-scene exists (for standalone dev)
-if (document.getElementById("rock-scene") || document.getElementById("root")) {
-  mount(document.getElementById("rock-scene") || document.getElementById("root"));
+// Auto-mount only on localhost (for dev)
+if (window.location.hostname === "localhost") {
+  const el = document.getElementById("rock-scene") || document.getElementById("root");
+  if (el) mount(el);
 }
 
 // Expose globally for Webflow embed
