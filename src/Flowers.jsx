@@ -28,7 +28,7 @@ export default function Flowers({ rockRef, reflection = false }) {
   const { scale: rScale } = useResponsive();
   const base = assetBaseUrl;
   const prevIndex = useRef(0);
-  const progressRef = useRef({ value: 0 }); // 0 = visible, 1 = dissolved
+  const progressRef = useRef({ value: 1 }); // start dissolved (entrance is not Info)
   const transitioning = useRef(false);
 
   const gltf = useLoader(GLTFLoader, `${base}/models/flowers.glb`, (loader) => {
@@ -73,7 +73,7 @@ export default function Flowers({ rockRef, reflection = false }) {
     // Trigger transition when activeIndex changes
     if (prevIndex.current !== currentIndex && !transitioning.current) {
       transitioning.current = true;
-      const shouldShow = currentIndex === 0;
+      const shouldShow = currentIndex === 1; // only on Info rock
 
       gsap.to(progressRef.current, {
         value: shouldShow ? 0 : 1,

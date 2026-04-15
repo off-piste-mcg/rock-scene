@@ -2,12 +2,22 @@ import { create } from "zustand";
 
 const rocks = [
   {
+    label: "Entrance",
+    texture: "/textures/entrance_beauty_2.png",
+    projection: "/textures/entrance_projection.png",
+  },
+  {
     label: "Info",
     texture: "/textures/rock1_beauty_2.png",
     projection: "/textures/rock1_projection.png",
   },
   {
     label: "What we offer",
+    texture: "/textures/rock2_beauty_2.png",
+    projection: "/textures/rock2_projection.png",
+  },
+  {
+    label: "Go off-piste",
     texture: "/textures/rock2_beauty_2.png",
     projection: "/textures/rock2_projection.png",
   },

@@ -9,6 +9,8 @@ import "./App.css";
 
 const isDev = window.location.hostname === "localhost";
 
+const NAV_MAP = { entrance: 0, "1": 1, "2": 2, "3": 3 };
+
 function NavListener() {
   const setActiveIndex = useStore((s) => s.setActiveIndex);
 
@@ -16,8 +18,8 @@ function NavListener() {
     const buttons = document.querySelectorAll("[data-nav]");
     const handler = (e) => {
       const nav = e.currentTarget.getAttribute("data-nav");
-      const index = parseInt(nav, 10) - 1; // data-nav="1" → index 0
-      if (!isNaN(index)) setActiveIndex(index);
+      const index = NAV_MAP[nav] ?? parseInt(nav, 10) - 1;
+      if (!isNaN(index) && index >= 0) setActiveIndex(index);
     };
     buttons.forEach((btn) => btn.addEventListener("click", handler));
     return () => buttons.forEach((btn) => btn.removeEventListener("click", handler));
