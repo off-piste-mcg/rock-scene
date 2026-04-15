@@ -1,8 +1,9 @@
-import { useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
+import { useEffect, useRef } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import Rock from "./Rock";
 import Environment from "./Environment";
 import { useStore } from "./store";
+import { useResponsive } from "./useResponsive";
 import "./App.css";
 
 const isDev = window.location.hostname === "localhost";
@@ -40,6 +41,20 @@ function DevButtons() {
   );
 }
 
+function CameraRig() {
+  const { camera } = useThree();
+  const { cameraZ } = useResponsive();
+  const targetZ = useRef(cameraZ);
+
+  targetZ.current = cameraZ;
+
+  useFrame(() => {
+    camera.position.z += (targetZ.current - camera.position.z) * 0.05;
+  });
+
+  return null;
+}
+
 function App() {
   return (
     <div id="app">
@@ -49,6 +64,7 @@ function App() {
         gl={{ alpha: true }}
         style={{ background: "transparent" }}
       >
+        <CameraRig />
         <ambientLight intensity={1.5} />
         <directionalLight position={[5, 5, 5]} intensity={2} />
         <directionalLight position={[-5, 3, -5]} intensity={1} />

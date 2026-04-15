@@ -20,6 +20,9 @@ function mount(target, options = {}) {
   if (options.assetBaseUrl) {
     useStore.getState().setAssetBaseUrl(options.assetBaseUrl);
   }
+  if (options.responsive) {
+    useStore.getState().setResponsive(options.responsive);
+  }
 
   createRoot(el).render(
     <StrictMode>
