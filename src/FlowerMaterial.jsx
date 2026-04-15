@@ -8,6 +8,7 @@ const FlowerMaterial = shaderMaterial(
     uProgress: 0,
     uTime: 0,
     uEmissiveBoost: 0.5,
+    uOpacity: 1,
   },
   // vertex
   `
@@ -32,6 +33,7 @@ const FlowerMaterial = shaderMaterial(
     uniform float uProgress;
     uniform float uTime;
     uniform float uEmissiveBoost;
+    uniform float uOpacity;
     varying vec2 vUv;
     varying vec3 vPos;
     varying float vDepth;
@@ -111,7 +113,7 @@ const FlowerMaterial = shaderMaterial(
 
       // when fully visible (progress = 0), just show the flowers
       if (uProgress < 0.001) {
-        gl_FragColor = vec4(col, tex.a);
+        gl_FragColor = vec4(col, tex.a * uOpacity);
         return;
       }
 
@@ -130,7 +132,7 @@ const FlowerMaterial = shaderMaterial(
       col += glowColor * edgeGlow * 0.6;
 
       // discard dissolved pixels
-      float alpha = tex.a * dissolve;
+      float alpha = tex.a * dissolve * uOpacity;
       if (alpha < 0.01) discard;
 
       gl_FragColor = vec4(col, alpha);

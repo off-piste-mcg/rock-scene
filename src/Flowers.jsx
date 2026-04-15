@@ -21,7 +21,7 @@ const MESH_TEXTURES = {
   daisy03: "/textures/flowers+grass03_edit_03_flowers_edit_daisy03_beauty.png",
 };
 
-export default function Flowers({ rockRef }) {
+export default function Flowers({ rockRef, reflection = false }) {
   const groupRef = useRef();
   const materialsRef = useRef([]);
   const { assetBaseUrl } = useStore();
@@ -94,14 +94,19 @@ export default function Flowers({ rockRef }) {
     });
   });
 
+  const yPos = reflection ? -3.5 : 0.5;
+  const yScale = reflection ? -rScale : rScale;
+  const opacity = reflection ? 0.25 : 1;
+
   return (
-    <group ref={groupRef} position={[0, 0.5, 0]} scale={[rScale, rScale, rScale]}>
+    <group ref={groupRef} position={[0, yPos, 0]} scale={[rScale, yScale, rScale]}>
       {meshes.map((m, i) => (
-        <mesh key={m.name} geometry={m.geometry} renderOrder={3}>
+        <mesh key={m.name} geometry={m.geometry} renderOrder={reflection ? 0 : 3}>
           <flowerMaterial
             ref={(el) => (materialsRef.current[i] = el)}
             uTexture={textureMap[m.name]}
-            uEmissiveBoost={0.5}
+            uEmissiveBoost={reflection ? 0.2 : 0.5}
+            uOpacity={opacity}
             transparent
             depthWrite={false}
           />

@@ -91,6 +91,7 @@ function App() {
           <Rock meshRefOut={rockMeshRef} />
           <Flowers rockRef={rockMeshRef} />
           <Rock reflection />
+          <Flowers rockRef={rockMeshRef} reflection />
           <Environment />
         </SceneGroup>
       </Canvas>
