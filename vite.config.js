@@ -17,7 +17,7 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: 'src/main.jsx',
+      entry: 'src/entry.js',
       name: 'RockScene',
       fileName: 'rock-scene',
       formats: ['iife'],
