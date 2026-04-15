@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { useStore } from "./store";
 import gsap from "gsap";
 import "./GrowMaterial";
@@ -14,7 +15,11 @@ export default function Rock({ reflection = false }) {
   const transitioning = useRef(false);
 
   const base = assetBaseUrl;
-  const gltf = useLoader(GLTFLoader, `${base}/models/rock.gltf`);
+  const gltf = useLoader(GLTFLoader, `${base}/models/rock.glb`, (loader) => {
+    const draco = new DRACOLoader();
+    draco.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.7/");
+    loader.setDRACOLoader(draco);
+  });
   let geometry = null;
   gltf.scene.updateMatrixWorld(true);
   gltf.scene.traverse((child) => {

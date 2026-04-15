@@ -5,6 +5,8 @@ import Environment from "./Environment";
 import { useStore } from "./store";
 import "./App.css";
 
+const isDev = window.location.hostname === "localhost";
+
 function NavListener() {
   const setActiveIndex = useStore((s) => s.setActiveIndex);
 
@@ -22,10 +24,27 @@ function NavListener() {
   return null;
 }
 
+function DevButtons() {
+  const { rocks, activeIndex, setActiveIndex } = useStore();
+
+  return (
+    <div className="buttons">
+      {rocks.map((_, i) => (
+        <button
+          key={i}
+          className={i === activeIndex ? "active" : ""}
+          onClick={() => setActiveIndex(i)}
+        />
+      ))}
+    </div>
+  );
+}
+
 function App() {
   return (
     <div id="app">
       <Canvas
+        dpr={[1, 1.5]}
         camera={{ position: [0, 0, 6], fov: 50 }}
         gl={{ alpha: true }}
         style={{ background: "transparent" }}
@@ -38,6 +57,7 @@ function App() {
         <Environment />
       </Canvas>
       <NavListener />
+      {isDev && <DevButtons />}
     </div>
   );
 }
