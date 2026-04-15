@@ -3,4 +3,7 @@ if (typeof window !== "undefined" && !window.process) {
   window.process = { env: { NODE_ENV: "production" }, emit: function() {} };
 }
 
-export { mount } from "./main.jsx";
+import { mount } from "./main.jsx";
+
+// Expose globally for Webflow
+window.RockScene = { mount };
