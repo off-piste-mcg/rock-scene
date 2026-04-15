@@ -7,8 +7,10 @@ const GrowMaterial = shaderMaterial(
     uTexture1: new THREE.Texture(),
     uTexture2: new THREE.Texture(),
     uLightmask: new THREE.Texture(),
+    uLightmaskNext: new THREE.Texture(),
     uProgress: 0,
     uOpacity: 1,
+    uTime: 0,
   },
   // vertex
   `
@@ -24,9 +26,10 @@ const GrowMaterial = shaderMaterial(
       vec4 worldPos = modelMatrix * vec4(position, 1.0);
       vWorldPos = worldPos.xyz;
       vec4 viewPos = modelViewMatrix * vec4(position, 1.0);
-      vec4 viewCenter = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
-      float relZ = viewPos.z - viewCenter.z;
-      vDepth = (-relZ + 1.0) * 0.5; // 0 = facing camera, 1 = away
+      // use world-space Z so the spread always starts from the front
+      // regardless of rock rotation
+      float worldZ = worldPos.z;
+      vDepth = (-worldZ + 1.0) * 0.5; // 0 = front (camera side), 1 = back
       vViewNormal = normalize(normalMatrix * normal);
       gl_Position = projectionMatrix * viewPos;
       vScreenPos = gl_Position;
@@ -37,8 +40,10 @@ const GrowMaterial = shaderMaterial(
     uniform sampler2D uTexture1;
     uniform sampler2D uTexture2;
     uniform sampler2D uLightmask;
+    uniform sampler2D uLightmaskNext;
     uniform float uProgress;
     uniform float uOpacity;
+    uniform float uTime;
     varying vec2 vUv;
     varying vec3 vPos;
     varying float vDepth;
@@ -134,12 +139,33 @@ const GrowMaterial = shaderMaterial(
       float diffuse = 0.4 + diff1 * 0.8 + diff2 * 0.4 + diff3 * 0.3;
       float lighting = diffuse + rim;
 
-      // --- lightmask projection ---
+      // --- lightmask projection with glitch ---
       vec2 projUv = vWorldPos.xy * 0.6 + vec2(0.5, 0.25);
-      vec4 lm = texture2D(uLightmask, projUv);
+
+      // glitch: random horizontal shifts per scanline
+      float scanline = floor(projUv.y * 40.0);
+      float glitchRand = fract(sin(scanline * 43.7 + floor(uTime * 30.0) * 17.3) * 4375.5);
+      float glitchStrength = smoothstep(0.7, 1.0, glitchRand);
+
+      // intense glitch during transition
+      float transitionGlitch = uProgress * (1.0 - uProgress) * 4.0; // peaks at 0.5
+      glitchStrength *= transitionGlitch * 6.0;
+
+      vec2 glitchedUv = projUv;
+      glitchedUv.x += glitchStrength * 0.06 * (glitchRand - 0.5);
+
+      // sample both current and next projection
+      vec4 lmCurrent = texture2D(uLightmask, glitchedUv);
+      vec4 lmNext = texture2D(uLightmaskNext, glitchedUv);
+
+      // hard snap between projections mid-transition
+      vec4 lm = mix(lmCurrent, lmNext, step(0.5, uProgress));
+
+      // heavy flicker during transition — projection cutting in and out
+      float flicker = 1.0 - transitionGlitch * step(0.6, glitchRand);
 
       float facing = max(0.0, N.z);
-      float attenuation = smoothstep(0.0, 0.4, facing);
+      float attenuation = smoothstep(0.0, 0.4, facing) * flicker;
       lm.rgb *= attenuation;
 
       // hard cutoff: show nothing of texture2 when progress is 0
@@ -159,7 +185,7 @@ const GrowMaterial = shaderMaterial(
       float threshold = directional * 0.65 + (1.0 - n) * 0.35;
 
       // spread with overshoot to fully cover
-      float spread = uProgress * 1.4 - 0.1;
+      float spread = uProgress * 1.3 + 0.1;
 
       // organic edge
       float mask = 1.0 - smoothstep(spread - 0.02, spread + 0.02, threshold);

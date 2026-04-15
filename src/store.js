@@ -1,13 +1,20 @@
 import { create } from "zustand";
 
-const states = [
-  { label: "Albedo", color: "#4a7c2e" },
-  { label: "Beauty", color: "#2e6b9e" },
-  { label: "Normals", color: "#b0c4de" },
+const rocks = [
+  {
+    label: "Info",
+    texture: "/textures/rock1_beauty_2.png",
+    projection: "/textures/rock1_projection.png",
+  },
+  {
+    label: "What we offer",
+    texture: "/textures/rock2_beauty_2.png",
+    projection: "/textures/rock2_projection.png",
+  },
 ];
 
 export const useStore = create((set) => ({
-  states,
+  rocks,
   activeIndex: 0,
   assetBaseUrl: "",
   setActiveIndex: (index) => set({ activeIndex: index }),

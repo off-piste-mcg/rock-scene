@@ -5,9 +5,48 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>test_project</title>
+    <style>
+      .dev-nav {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        display: flex;
+        gap: 12px;
+        z-index: 100;
+      }
+      .dev-nav button {
+        padding: 8px 16px;
+        border: 1px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+        cursor: pointer;
+        font-size: 12px;
+        border-radius: 4px;
+      }
+      .dev-nav button.active {
+        border-color: #3b82f6;
+        background: rgba(59,130,246,0.3);
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- Dev-only nav to simulate Webflow data-nav buttons -->
+    <div class="dev-nav">
+      <button data-nav="1" class="active">1/Info</button>
+      <button data-nav="2">2/What we offer</button>
+      <button data-nav="3">3/Routes</button>
+    </div>
+
+    <script>
+      document.querySelectorAll('[data-nav]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-nav]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

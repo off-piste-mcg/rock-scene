@@ -9,37 +9,42 @@ import "./GrowMaterial";
 export default function Rock({ reflection = false }) {
   const matRef = useRef();
   const meshRef = useRef();
-  const { activeIndex, assetBaseUrl } = useStore();
+  const { activeIndex, rocks, assetBaseUrl } = useStore();
   const prevIndex = useRef(activeIndex);
   const transitioning = useRef(false);
 
   const base = assetBaseUrl;
   const gltf = useLoader(GLTFLoader, `${base}/models/rock.gltf`);
   let geometry = null;
+  gltf.scene.updateMatrixWorld(true);
   gltf.scene.traverse((child) => {
-    if (child.isMesh && !geometry) geometry = child.geometry;
+    if (child.isMesh && !geometry) {
+      geometry = child.geometry.clone();
+      geometry.applyMatrix4(child.matrixWorld);
+    }
   });
 
-  const texturePaths = [
-    `${base}/textures/tmc_off_piste_black rock 4096x4096 albedo.png`,
-    `${base}/textures/tmc_off_piste_black rock 4096x4096 beauty.png`,
-    `${base}/textures/tmc_off_piste_black rock 4096x4096 normals.png`,
-  ];
-  const textures = useTexture(texturePaths);
-  textures.forEach((t) => {
+  // Load all rock textures upfront
+  const allTextures = useTexture(rocks.map((r) => `${base}${r.texture}`));
+  allTextures.forEach((t) => {
     t.flipY = false;
     t.needsUpdate = true;
   });
-  const lightmask = useTexture(`${base}/textures/lightmask.png`);
+
+  // Load all projections upfront
+  const allProjections = useTexture(rocks.map((r) => `${base}${r.projection}`));
+
   const baseOpacity = reflection ? 0.25 : 1;
 
-  useFrame(() => {
+  useFrame(({ clock }) => {
     meshRef.current.rotation.y += 0.003;
+    matRef.current.uTime = clock.getElapsedTime();
 
     if (prevIndex.current !== activeIndex && !transitioning.current) {
       transitioning.current = true;
       const mat = matRef.current;
-      mat.uTexture2 = textures[activeIndex];
+      mat.uTexture2 = allTextures[activeIndex];
+      mat.uLightmaskNext = allProjections[activeIndex];
       mat.uProgress = 0;
 
       gsap.to(mat, {
@@ -47,7 +52,8 @@ export default function Rock({ reflection = false }) {
         duration: 5,
         ease: "power1.inOut",
         onComplete: () => {
-          mat.uTexture1 = textures[activeIndex];
+          mat.uTexture1 = allTextures[activeIndex];
+          mat.uLightmask = allProjections[activeIndex];
           mat.uProgress = 0;
           prevIndex.current = activeIndex;
           transitioning.current = false;
@@ -62,14 +68,17 @@ export default function Rock({ reflection = false }) {
       geometry={geometry}
       position={reflection ? [0, -2.5, 0] : [0, 0.5, 0]}
       scale={reflection ? [1, -1, 1] : [1, 1, 1]}
+      rotation={[0, 0, 0]}
       renderOrder={reflection ? 0 : 2}
     >
       <growMaterial
         ref={matRef}
-        uTexture1={textures[0]}
-        uTexture2={textures[0]}
-        uLightmask={lightmask}
+        uTexture1={allTextures[0]}
+        uTexture2={allTextures[0]}
+        uLightmask={allProjections[0]}
+        uLightmaskNext={allProjections[0]}
         uProgress={0}
+        uTime={0}
         uOpacity={baseOpacity}
         transparent
         depthWrite={!reflection}
