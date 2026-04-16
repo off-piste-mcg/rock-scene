@@ -1,8 +1,8 @@
 import { useRef, useMemo } from "react";
-import { useFrame, useLoader } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
 import gsap from "gsap";
 import { useStore } from "./store";
 import { useResponsive } from "./useResponsive";
@@ -10,21 +10,21 @@ import "./FlowerMaterial";
 
 // mesh name → texture file mapping
 const MESH_TEXTURES = {
-  grass01: "/textures/flowers+grass03_edit_03_grass_edit_grass01_beauty.png",
-  grass02: "/textures/flowers+grass03_edit_03_grass_edit_grass02_beauty.png",
-  grass03: "/textures/flowers+grass03_edit_03_grass_edit_grass03_beauty.png",
-  tempest01: "/textures/flowers+grass03_edit_03_flowers_edit_tempest01_beauty.png",
-  tempest02: "/textures/flowers+grass03_edit_03_flowers_edit_tempest02_beauty.png",
-  tempest03: "/textures/flowers+grass03_edit_03_flowers_edit_tempest03_beauty.png",
-  daisy01: "/textures/flowers+grass03_edit_03_flowers_edit_daisy01_beauty.png",
-  daisy02: "/textures/flowers+grass03_edit_03_flowers_edit_daisy02_beauty.png",
-  daisy03: "/textures/flowers+grass03_edit_03_flowers_edit_daisy03_beauty.png",
+  grass01: "/textures/flowers+grass03_edit_03_grass_edit_grass01_beauty.ktx2",
+  grass02: "/textures/flowers+grass03_edit_03_grass_edit_grass02_beauty.ktx2",
+  grass03: "/textures/flowers+grass03_edit_03_grass_edit_grass03_beauty.ktx2",
+  tempest01: "/textures/flowers+grass03_edit_03_flowers_edit_tempest01_beauty.ktx2",
+  tempest02: "/textures/flowers+grass03_edit_03_flowers_edit_tempest02_beauty.ktx2",
+  tempest03: "/textures/flowers+grass03_edit_03_flowers_edit_tempest03_beauty.ktx2",
+  daisy01: "/textures/flowers+grass03_edit_03_flowers_edit_daisy01_beauty.ktx2",
+  daisy02: "/textures/flowers+grass03_edit_03_flowers_edit_daisy02_beauty.ktx2",
+  daisy03: "/textures/flowers+grass03_edit_03_flowers_edit_daisy03_beauty.ktx2",
 };
 
 export default function Flowers({ rockRef, reflection = false }) {
   const groupRef = useRef();
   const materialsRef = useRef([]);
-  const { assetBaseUrl } = useStore();
+  const assetBaseUrl = useStore((s) => s.assetBaseUrl);
   const { scale: rScale } = useResponsive();
   const base = assetBaseUrl;
   const prevIndex = useRef(0);
@@ -37,8 +37,12 @@ export default function Flowers({ rockRef, reflection = false }) {
     loader.setDRACOLoader(draco);
   });
 
+  const { gl } = useThree();
   const texturePaths = Object.values(MESH_TEXTURES).map((t) => `${base}${t}`);
-  const textureArray = useTexture(texturePaths);
+  const textureArray = useLoader(KTX2Loader, texturePaths, (loader) => {
+    loader.setTranscoderPath("https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/basis/");
+    loader.detectSupport(gl);
+  });
   const textureMap = useMemo(() => {
     const map = {};
     const keys = Object.keys(MESH_TEXTURES);

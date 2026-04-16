@@ -3,7 +3,10 @@ if (typeof window !== "undefined" && !window.process) {
   window.process = { env: { NODE_ENV: "production" }, emit: function() {} };
 }
 
+import gsap from "gsap";
 import { mount } from "./main.jsx";
+
+gsap.defaults({ overwrite: "auto" });
 
 // Expose globally for Webflow
 window.RockScene = { mount };

@@ -3,23 +3,23 @@ import { create } from "zustand";
 const rocks = [
   {
     label: "Entrance",
-    texture: "/textures/entrance_beauty_2.png",
-    projection: "/textures/entrance_projection.png",
+    texture: "/textures/entrance_beauty_2.ktx2",
+    projection: "/textures/entrance_projection.ktx2",
   },
   {
     label: "Info",
-    texture: "/textures/rock1_beauty_2.png",
-    projection: "/textures/rock1_projection.png",
+    texture: "/textures/rock1_beauty_2.ktx2",
+    projection: "/textures/rock1_projection.ktx2",
   },
   {
     label: "What we offer",
-    texture: "/textures/rock2_beauty_2.png",
-    projection: "/textures/rock2_projection.png",
+    texture: "/textures/rock2_beauty_2.ktx2",
+    projection: "/textures/rock2_projection.ktx2",
   },
   {
     label: "Go off-piste",
-    texture: "/textures/rock2_beauty_2.png",
-    projection: "/textures/rock2_projection.png",
+    texture: "/textures/rock2_beauty_2.ktx2",
+    projection: "/textures/rock2_projection.ktx2",
   },
 ];
 

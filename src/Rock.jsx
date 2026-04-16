@@ -1,8 +1,8 @@
 import { useRef, useMemo } from "react";
-import { useFrame, useLoader } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { KTX2Loader } from "three/examples/jsm/loaders/KTX2Loader.js";
 import { useStore } from "./store";
 import { useResponsive } from "./useResponsive";
 import gsap from "gsap";
@@ -11,7 +11,9 @@ import "./GrowMaterial";
 export default function Rock({ reflection = false, meshRefOut }) {
   const matRef = useRef();
   const meshRef = useRef();
-  const { activeIndex, rocks, assetBaseUrl } = useStore();
+  const activeIndex = useStore((s) => s.activeIndex);
+  const rocks = useStore((s) => s.rocks);
+  const assetBaseUrl = useStore((s) => s.assetBaseUrl);
   const prevIndex = useRef(activeIndex);
   const activeTween = useRef(null);
 
@@ -33,17 +35,25 @@ export default function Rock({ reflection = false, meshRefOut }) {
     return geo;
   }, [gltf]);
 
-  // Load all rock textures upfront
-  const allTextures = useTexture(rocks.map((r) => `${base}${r.texture}`));
+  // Load all rock textures as KTX2
+  const { gl } = useThree();
+  const allTextures = useLoader(KTX2Loader, rocks.map((r) => `${base}${r.texture}`), (loader) => {
+    loader.setTranscoderPath("https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/basis/");
+    loader.detectSupport(gl);
+  });
   useMemo(() => {
     allTextures.forEach((t) => {
       t.flipY = false;
+      t.colorSpace = "";
       t.needsUpdate = true;
     });
   }, [allTextures]);
 
-  // Load all projections upfront
-  const allProjections = useTexture(rocks.map((r) => `${base}${r.projection}`));
+  // Load all projections as KTX2
+  const allProjections = useLoader(KTX2Loader, rocks.map((r) => `${base}${r.projection}`), (loader) => {
+    loader.setTranscoderPath("https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/basis/");
+    loader.detectSupport(gl);
+  });
 
   const baseOpacity = reflection ? 0.25 : 1;
   const { scale: rScale, offset } = useResponsive();
