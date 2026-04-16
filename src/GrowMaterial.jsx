@@ -108,7 +108,9 @@ const GrowMaterial = shaderMaterial(
       float glitchRand = fract(sin(scanline * 43.7 + floor(uTime * 30.0) * 17.3) * 4375.5);
       float glitchStrength = smoothstep(0.7, 1.0, glitchRand);
 
-      float transitionGlitch = uProgress * (1.0 - uProgress) * 4.0;
+      // glitch only in the middle 30% of the transition (0.35 - 0.65)
+      float glitchWindow = smoothstep(0.3, 0.4, uProgress) * (1.0 - smoothstep(0.6, 0.7, uProgress));
+      float transitionGlitch = glitchWindow * 4.0;
       glitchStrength *= transitionGlitch * 6.0;
 
       vec2 glitchedUv = projUv;
