@@ -24,12 +24,12 @@ const rocks = [
 ];
 
 const defaultResponsive = {
-  1920: { scale: 1.5, cameraZ: 6, offset: [-1.5, 0, 0], projScale: 0.4, projOffset: [0.4, 0.65] },
-  1440: { scale: 1.5, cameraZ: 6, offset: [-1.2, 0, 0], projScale: 0.4, projOffset: [0.4, 0.65] },
-  1024: { scale: 1.35, cameraZ: 6.5, offset: [-0.5, 0, 0], projScale: 0.4, projOffset: [0.4, 0.65] },
-  768: { scale: 1.1, cameraZ: 7, offset: [0, 0, 0], projScale: 0.5, projOffset: [0.4, 0.65] },
-  480: { scale: 1.1, cameraZ: 6, offset: [0, -0.5, 0], projScale: 0.55, projOffset: [0.4, 0.75] },
-  0: { scale: 1, cameraZ: 6, offset: [0, 0, 0], projScale: 0.3, projOffset: [0.4, 0.65] },
+  1920: { scale: 1.5, cameraZ: 6, offset: [-1.5, 0, 0], projScale: 0.4, projOffset: [0.4, 0.65], reflectionY: -3.5, fogY: 0 },
+  1440: { scale: 1.5, cameraZ: 6, offset: [-1.2, 0, 0], projScale: 0.4, projOffset: [0.4, 0.65], reflectionY: -3.5, fogY: 0 },
+  1024: { scale: 1.35, cameraZ: 6.5, offset: [-0.5, 0, 0], projScale: 0.4, projOffset: [0.4, 0.65], reflectionY: -3.5, fogY: 0 },
+  768: { scale: 1.1, cameraZ: 7, offset: [0, 0, 0], projScale: 0.5, projOffset: [0.4, 0.65], reflectionY: -2.5, fogY: 0 },
+  480: { scale: 1.1, cameraZ: 6, offset: [0, -0.5, 0], projScale: 0.55, projOffset: [0.4, 0.75], reflectionY: -2.25, fogY: 0 },
+  0: { scale: 1, cameraZ: 6, offset: [0, 0, 0], projScale: 0.3, projOffset: [0.4, 0.65], reflectionY: -3.5, fogY: 0 },
 };
 
 export const useStore = create((set) => ({

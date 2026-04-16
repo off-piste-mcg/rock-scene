@@ -39,6 +39,8 @@ function interpolate(breakpoints, width) {
     offset: lerpArray(a.offset, b.offset, t),
     projScale: lerp(a.projScale, b.projScale, t),
     projOffset: lerpArray(a.projOffset, b.projOffset, t),
+    reflectionY: lerp(a.reflectionY, b.reflectionY, t),
+    fogY: lerp(a.fogY, b.fogY, t),
   };
 }
 

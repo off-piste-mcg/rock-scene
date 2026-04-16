@@ -25,7 +25,7 @@ export default function Flowers({ rockRef, reflection = false }) {
   const groupRef = useRef();
   const materialsRef = useRef([]);
   const assetBaseUrl = useStore((s) => s.assetBaseUrl);
-  const { scale: rScale } = useResponsive();
+  const { scale: rScale, reflectionY } = useResponsive();
   const base = assetBaseUrl;
   const prevIndex = useRef(0);
   const progressRef = useRef({ value: 1 }); // start dissolved (entrance is not Info)
@@ -99,7 +99,7 @@ export default function Flowers({ rockRef, reflection = false }) {
     });
   });
 
-  const yPos = reflection ? -3.5 : 0.5;
+  const yPos = reflection ? reflectionY : 0.5;
   const yScale = reflection ? -rScale : rScale;
   const opacity = reflection ? 0.25 : 1;
 

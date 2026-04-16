@@ -1,6 +1,7 @@
 import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import gsap from "gsap";
+import { useResponsive } from "./useResponsive";
 import "./MistMaterial";
 
 function CloudSprite({ position, scale, speed, introDelay = 0 }) {
@@ -126,14 +127,16 @@ export default function Environment() {
     { x: -0.4, startY: -4.0, z: 2.2, speed: 0.018, scale: [1.5, 3, 1], delay: 0.6, drift: 0.25 },
   ], []);
 
+  const { fogY } = useResponsive();
+
   return (
-    <>
+    <group position={[0, fogY, 0]}>
       {clouds.map((cloud, i) => (
         <CloudSprite key={i} {...cloud} />
       ))}
       {windSprites.map((wind, i) => (
         <WindSprite key={`wind-${i}`} {...wind} />
       ))}
-    </>
+    </group>
   );
 }
