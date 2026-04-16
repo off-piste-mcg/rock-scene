@@ -7,6 +7,7 @@ import gsap from "gsap";
 import { mount } from "./main.jsx";
 
 gsap.defaults({ overwrite: "auto" });
+gsap.ticker.lagSmoothing(0);
 
 // Expose globally for Webflow
 window.RockScene = { mount };
