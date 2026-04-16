@@ -91,7 +91,7 @@ export default function Flowers({ rockRef, reflection = false }) {
       });
     }
 
-    // Hide group when fully dissolved — skip draw calls entirely
+    // Hide group when fully dissolved — skip 9 draw calls + 440K verts
     if (groupRef.current) {
       groupRef.current.visible = progressRef.current.value < 0.99;
     }

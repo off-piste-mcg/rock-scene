@@ -6,7 +6,7 @@ const MistMaterial = shaderMaterial(
   {
     uTime: 0,
     uOpacity: 0.35,
-    uColor: new THREE.Color("#6BA0D8"),
+    uColor: new THREE.Color("#205A74"),
   },
   // vertex
   `
@@ -49,7 +49,7 @@ const MistMaterial = shaderMaterial(
       float val = 0.0;
       float amp = 0.5;
       float freq = 1.0;
-      for (int i = 0; i < 3; i++) {
+      for (int i = 0; i < 6; i++) {
         val += amp * noise(p * freq);
         freq *= 2.0;
         amp *= 0.5;

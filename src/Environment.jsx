@@ -95,47 +95,37 @@ function smoothstep(min, max, value) {
 }
 
 export default function Environment() {
-  const isMobile = window.innerWidth < 768;
+  // cloud sprites clustered around the rock base
+  const clouds = useMemo(() => [
+    // near the rock — wispy fog (appear after rock starts showing)
+    { position: [0, -1.8, 0.5], scale: [4, 2.5, 1], speed: 1.0, introDelay: 1.8 },
+    { position: [-1.2, -2.0, 0.8], scale: [3.5, 2, 1], speed: 0.8, introDelay: 2.2 },
+    { position: [1.5, -1.9, 0.3], scale: [3, 2, 1], speed: 1.2, introDelay: 2.0 },
+    { position: [0.3, -2.1, -0.5], scale: [3.5, 2.5, 1], speed: 0.9, introDelay: 2.4 },
+    { position: [-0.8, -1.7, 1.0], scale: [2.5, 1.8, 1], speed: 1.1, introDelay: 2.1 },
 
-  // cloud sprites — fewer on mobile
-  const clouds = useMemo(() => {
-    const all = [
-      // near the rock — wispy fog (appear after rock starts showing)
-      { position: [0, -1.8, 0.5], scale: [4, 2.5, 1], speed: 1.0, introDelay: 1.8 },
-      { position: [-1.2, -2.0, 0.8], scale: [3.5, 2, 1], speed: 0.8, introDelay: 2.2 },
-      { position: [1.5, -1.9, 0.3], scale: [3, 2, 1], speed: 1.2, introDelay: 2.0 },
-      { position: [0.3, -2.1, -0.5], scale: [3.5, 2.5, 1], speed: 0.9, introDelay: 2.4 },
-      { position: [-0.8, -1.7, 1.0], scale: [2.5, 1.8, 1], speed: 1.1, introDelay: 2.1 },
+    // bottom fog layer — wider, bloom in later
+    { position: [0, -2.5, 0], scale: [9, 2.5, 1], speed: 0.6, introDelay: 2.6 },
+    { position: [-3, -2.6, -1], scale: [7, 2, 1], speed: 0.5, introDelay: 3.0 },
+    { position: [3, -2.6, -1], scale: [7, 2, 1], speed: 0.7, introDelay: 2.8 },
+    { position: [0, -2.7, -0.5], scale: [8, 2, 1], speed: 0.45, introDelay: 3.2 },
+    { position: [-1.5, -2.5, 0.5], scale: [6, 1.8, 1], speed: 0.55, introDelay: 3.0 },
+  ], []);
 
-      // bottom fog layer — wider, bloom in later
-      { position: [0, -2.5, 0], scale: [9, 2.5, 1], speed: 0.6, introDelay: 2.6 },
-      { position: [-3, -2.6, -1], scale: [7, 2, 1], speed: 0.5, introDelay: 3.0 },
-      { position: [3, -2.6, -1], scale: [7, 2, 1], speed: 0.7, introDelay: 2.8 },
-      { position: [0, -2.7, -0.5], scale: [8, 2, 1], speed: 0.45, introDelay: 3.2 },
-      { position: [-1.5, -2.5, 0.5], scale: [6, 1.8, 1], speed: 0.55, introDelay: 3.0 },
-    ];
-    // Mobile: keep 3 close + 2 bottom = 5 sprites instead of 10
-    return isMobile ? [all[0], all[2], all[4], all[5], all[7]] : all;
-  }, []);
-
-  // wind wisps — fewer on mobile
-  const windSprites = useMemo(() => {
-    const all = [
-      // right side — drift leftward toward rock
-      { x: 1.0, startY: -3.5, z: 0.5, speed: 0.03, scale: [1.5, 3, 1], delay: 0, drift: -0.5 },
-      { x: 1.4, startY: -4.0, z: 0.2, speed: 0.025, scale: [1.8, 3.5, 1], delay: 0.35, drift: -0.6 },
-      { x: 0.8, startY: -3.8, z: 0.8, speed: 0.028, scale: [1.2, 2.5, 1], delay: 0.7, drift: -0.3 },
-      // left side — drift rightward toward rock
-      { x: -1.0, startY: -3.5, z: 0.4, speed: 0.03, scale: [1.5, 3, 1], delay: 0.15, drift: 0.5 },
-      { x: -1.4, startY: -4.0, z: 0.1, speed: 0.022, scale: [1.8, 3.5, 1], delay: 0.5, drift: 0.6 },
-      { x: -0.8, startY: -3.8, z: 0.7, speed: 0.026, scale: [1.2, 2.5, 1], delay: 0.85, drift: 0.3 },
-      // in front of rock — subtle, passing across
-      { x: 0.3, startY: -3.5, z: 2.5, speed: 0.02, scale: [1.2, 2.5, 1], delay: 0.2, drift: -0.3 },
-      { x: -0.4, startY: -4.0, z: 2.2, speed: 0.018, scale: [1.5, 3, 1], delay: 0.6, drift: 0.25 },
-    ];
-    // Mobile: keep 2 per side = 4 instead of 8
-    return isMobile ? [all[0], all[2], all[3], all[5]] : all;
-  }, []);
+  // wind wisps rising vertically with gentle curved drift
+  const windSprites = useMemo(() => [
+    // right side — drift leftward toward rock
+    { x: 1.0, startY: -3.5, z: 0.5, speed: 0.03, scale: [1.5, 3, 1], delay: 0, drift: -0.5 },
+    { x: 1.4, startY: -4.0, z: 0.2, speed: 0.025, scale: [1.8, 3.5, 1], delay: 0.35, drift: -0.6 },
+    { x: 0.8, startY: -3.8, z: 0.8, speed: 0.028, scale: [1.2, 2.5, 1], delay: 0.7, drift: -0.3 },
+    // left side — drift rightward toward rock
+    { x: -1.0, startY: -3.5, z: 0.4, speed: 0.03, scale: [1.5, 3, 1], delay: 0.15, drift: 0.5 },
+    { x: -1.4, startY: -4.0, z: 0.1, speed: 0.022, scale: [1.8, 3.5, 1], delay: 0.5, drift: 0.6 },
+    { x: -0.8, startY: -3.8, z: 0.7, speed: 0.026, scale: [1.2, 2.5, 1], delay: 0.85, drift: 0.3 },
+    // in front of rock — subtle, passing across
+    { x: 0.3, startY: -3.5, z: 2.5, speed: 0.02, scale: [1.2, 2.5, 1], delay: 0.2, drift: -0.3 },
+    { x: -0.4, startY: -4.0, z: 2.2, speed: 0.018, scale: [1.5, 3, 1], delay: 0.6, drift: 0.25 },
+  ], []);
 
   const { fogY } = useResponsive();
 
