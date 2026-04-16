@@ -60,6 +60,22 @@ export default function Rock({ reflection = false, meshRefOut }) {
   const targetScale = useRef(rScale);
   targetScale.current = rScale;
 
+  // Entrance animation — fade in from behind on first mount
+  const entered = useRef(false);
+  const introProgress = useRef({ opacity: 0, z: -2 });
+  useMemo(() => {
+    if (!entered.current) {
+      entered.current = true;
+      gsap.to(introProgress.current, {
+        opacity: 1,
+        z: 0,
+        duration: 1.5,
+        ease: "power2.out",
+        delay: 0.3,
+      });
+    }
+  }, []);
+
   useFrame(({ clock }) => {
     const mesh = meshRef.current;
 
@@ -69,9 +85,13 @@ export default function Rock({ reflection = false, meshRefOut }) {
     mesh.scale.y += ((reflection ? -s : s) - mesh.scale.y) * 0.05;
     mesh.scale.z += (s - mesh.scale.z) * 0.05;
 
+    // Apply intro offset
+    mesh.position.z = introProgress.current.z;
+
     mesh.rotation.y += 0.003;
     if (meshRefOut) meshRefOut.current = mesh;
     matRef.current.uTime = clock.getElapsedTime();
+    matRef.current.uOpacity = baseOpacity * introProgress.current.opacity;
 
     if (prevIndex.current !== activeIndex) {
       const mat = matRef.current;
