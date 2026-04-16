@@ -55,7 +55,8 @@ export default function Rock({ reflection = false, meshRefOut }) {
     loader.detectSupport(gl);
   });
 
-  const baseOpacity = reflection ? 0.25 : 1;
+  const baseOpacity = 1;
+  const darken = reflection ? 0.25 : 1;
   const { scale: rScale, offset, projScale, projOffset, reflectionY } = useResponsive();
   const targetScale = useRef(rScale);
   targetScale.current = rScale;
@@ -129,7 +130,7 @@ export default function Rock({ reflection = false, meshRefOut }) {
       position={reflection ? [0, reflectionY, 0] : [0, 0.5, 0]}
       scale={reflection ? [rScale, -rScale, rScale] : [rScale, rScale, rScale]}
       rotation={[0, 0, 0]}
-      renderOrder={reflection ? 0 : 2}
+      renderOrder={reflection ? -1 : 2}
     >
       <growMaterial
         ref={matRef}
@@ -140,10 +141,11 @@ export default function Rock({ reflection = false, meshRefOut }) {
         uProgress={0}
         uTime={0}
         uOpacity={baseOpacity}
+        uDarken={darken}
         uOffset={offset}
         uProjScale={projScale}
         uProjOffset={projOffset}
-        transparent
+        transparent={!reflection}
         depthWrite={!reflection}
       />
     </mesh>

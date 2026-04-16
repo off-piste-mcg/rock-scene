@@ -106,18 +106,19 @@ export default function Flowers({ rockRef, reflection = false }) {
 
   const yPos = reflection ? reflectionY : 0.5;
   const yScale = reflection ? -rScale : rScale;
-  const opacity = reflection ? 0.25 : 1;
+  const darken = reflection ? 0.25 : 1;
 
   return (
     <group ref={groupRef} position={[0, yPos, 0]} scale={[rScale, yScale, rScale]}>
       {meshes.map((m, i) => (
-        <mesh key={m.name} geometry={m.geometry} renderOrder={reflection ? 0 : 3}>
+        <mesh key={m.name} geometry={m.geometry} renderOrder={reflection ? -1 : 3}>
           <flowerMaterial
             ref={(el) => (materialsRef.current[i] = el)}
             uTexture={textureMap[m.name]}
             uEmissiveBoost={reflection ? 0.2 : 0.5}
-            uOpacity={opacity}
-            transparent
+            uOpacity={1}
+            uDarken={darken}
+            transparent={!reflection}
             depthWrite={false}
           />
         </mesh>

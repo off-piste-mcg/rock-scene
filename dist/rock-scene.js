@@ -4127,7 +4127,7 @@ No matching component was found for:
     }
     return val;
   }
-`;rC({GrowMaterial:KT({uTexture1:new oc,uTexture2:new oc,uLightmask:new oc,uLightmaskNext:new oc,uProgress:0,uOpacity:1,uTime:0,uOffset:new q(0,0,0),uProjScale:.4,uProjOffset:new K(.4,.65)},`
+`;rC({GrowMaterial:KT({uTexture1:new oc,uTexture2:new oc,uLightmask:new oc,uLightmaskNext:new oc,uProgress:0,uOpacity:1,uTime:0,uOffset:new q(0,0,0),uProjScale:.4,uProjOffset:new K(.4,.65),uDarken:1},`
     varying vec2 vUv;
     varying vec3 vPos;
     varying float vDepth;
@@ -4159,6 +4159,7 @@ No matching component was found for:
     uniform vec3 uOffset;
     uniform float uProjScale;
     uniform vec2 uProjOffset;
+    uniform float uDarken;
     varying vec2 vUv;
     varying vec3 vPos;
     varying float vDepth;
@@ -4204,8 +4205,8 @@ No matching component was found for:
       if (uProgress < 0.001) {
         vec4 lm = texture2D(uLightmask, projUv);
         lm.rgb *= smoothstep(0.0, 0.4, facing);
-        vec3 lit = t1.rgb * diffuse + vec3(rim);
-        gl_FragColor = vec4(lit + lm.rgb, t1.a * uOpacity);
+        vec3 lit = (t1.rgb * diffuse + vec3(rim) + lm.rgb) * uDarken;
+        gl_FragColor = vec4(lit, t1.a * uOpacity);
         return;
       }
 
@@ -4254,10 +4255,11 @@ No matching component was found for:
       color.rgb += glowColor * edgeGlow * 0.6 * fadeIn;
       color.rgb += lm.rgb;
 
+      color.rgb *= uDarken;
       color.a *= uOpacity;
       gl_FragColor = color;
     }
-  `)});function JT({reflection:e=!1,meshRefOut:t}){let n=(0,B.useRef)(),r=(0,B.useRef)(),i=VT(e=>e.activeIndex),a=VT(e=>e.rocks),o=VT(e=>e.assetBaseUrl),s=(0,B.useRef)(i),c=(0,B.useRef)(null),l=o,u=IS(iw,`${l}/models/rock.glb`,e=>{let t=new aT;t.setDecoderPath(`https://www.gstatic.com/draco/versioned/decoders/1.5.7/`),e.setDRACOLoader(t)}),d=(0,B.useMemo)(()=>{u.scene.updateMatrixWorld(!0);let e=null;return u.scene.traverse(t=>{t.isMesh&&!e&&(e=t.geometry.clone(),e.applyMatrix4(t.matrixWorld))}),e},[u]),{gl:f}=jS(),p=IS(kT,a.map(e=>`${l}${e.texture}`),e=>{e.setTranscoderPath(`https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/basis/`),e.detectSupport(f)});(0,B.useMemo)(()=>{p.forEach(e=>{e.flipY=!1,e.colorSpace=``,e.needsUpdate=!0})},[p]);let m=IS(kT,a.map(e=>`${l}${e.projection}`),e=>{e.setTranscoderPath(`https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/basis/`),e.detectSupport(f)}),h=e?.25:1,{scale:g,offset:_,projScale:v,projOffset:y,reflectionY:b}=GT(),x=(0,B.useRef)(g);x.current=g;let S=(0,B.useRef)(!1),C=(0,B.useRef)({opacity:0,z:-2});return(0,B.useMemo)(()=>{S.current||(S.current=!0,Ni.to(C.current,{opacity:1,z:0,duration:3.5,ease:`power3.out`,delay:.5}))},[]),MS(({clock:a})=>{let o=r.current,l=x.current;if(o.scale.x+=(l-o.scale.x)*.05,o.scale.y+=((e?-l:l)-o.scale.y)*.05,o.scale.z+=(l-o.scale.z)*.05,o.position.z=C.current.z,o.rotation.y+=.003,t&&(t.current=o),n.current.uTime=a.getElapsedTime(),n.current.uOpacity=h*C.current.opacity,s.current!==i){let e=n.current;c.current&&(c.current.kill(),e.uTexture1=p[s.current],e.uLightmask=m[s.current],e.uProgress=0),e.uTexture2=p[i],e.uLightmaskNext=m[i],e.uProgress=0,s.current=i,c.current=Ni.to(e,{uProgress:1,duration:5,ease:`power1.inOut`,onComplete:()=>{e.uTexture1=p[i],e.uLightmask=m[i],e.uProgress=0,c.current=null}})}}),(0,Ix.jsx)(`mesh`,{ref:r,geometry:d,position:e?[0,b,0]:[0,.5,0],scale:e?[g,-g,g]:[g,g,g],rotation:[0,0,0],renderOrder:e?0:2,children:(0,Ix.jsx)(`growMaterial`,{ref:n,uTexture1:p[0],uTexture2:p[0],uLightmask:m[0],uLightmaskNext:m[0],uProgress:0,uTime:0,uOpacity:h,uOffset:_,uProjScale:v,uProjOffset:y,transparent:!0,depthWrite:!e})})}rC({FlowerMaterial:KT({uTexture:new oc,uProgress:0,uTime:0,uEmissiveBoost:.5,uOpacity:1},`
+  `)});function JT({reflection:e=!1,meshRefOut:t}){let n=(0,B.useRef)(),r=(0,B.useRef)(),i=VT(e=>e.activeIndex),a=VT(e=>e.rocks),o=VT(e=>e.assetBaseUrl),s=(0,B.useRef)(i),c=(0,B.useRef)(null),l=o,u=IS(iw,`${l}/models/rock.glb`,e=>{let t=new aT;t.setDecoderPath(`https://www.gstatic.com/draco/versioned/decoders/1.5.7/`),e.setDRACOLoader(t)}),d=(0,B.useMemo)(()=>{u.scene.updateMatrixWorld(!0);let e=null;return u.scene.traverse(t=>{t.isMesh&&!e&&(e=t.geometry.clone(),e.applyMatrix4(t.matrixWorld))}),e},[u]),{gl:f}=jS(),p=IS(kT,a.map(e=>`${l}${e.texture}`),e=>{e.setTranscoderPath(`https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/basis/`),e.detectSupport(f)});(0,B.useMemo)(()=>{p.forEach(e=>{e.flipY=!1,e.colorSpace=``,e.needsUpdate=!0})},[p]);let m=IS(kT,a.map(e=>`${l}${e.projection}`),e=>{e.setTranscoderPath(`https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/basis/`),e.detectSupport(f)}),h=e?.25:1,{scale:g,offset:_,projScale:v,projOffset:y,reflectionY:b}=GT(),x=(0,B.useRef)(g);x.current=g;let S=(0,B.useRef)(!1),C=(0,B.useRef)({opacity:0,z:-2});return(0,B.useMemo)(()=>{S.current||(S.current=!0,Ni.to(C.current,{opacity:1,z:0,duration:3.5,ease:`power3.out`,delay:.5}))},[]),MS(({clock:a})=>{let o=r.current,l=x.current;if(o.scale.x+=(l-o.scale.x)*.05,o.scale.y+=((e?-l:l)-o.scale.y)*.05,o.scale.z+=(l-o.scale.z)*.05,o.position.z=C.current.z,o.rotation.y+=.003,t&&(t.current=o),n.current.uTime=a.getElapsedTime(),n.current.uOpacity=1*C.current.opacity,s.current!==i){let e=n.current;c.current&&(c.current.kill(),e.uTexture1=p[s.current],e.uLightmask=m[s.current],e.uProgress=0),e.uTexture2=p[i],e.uLightmaskNext=m[i],e.uProgress=0,s.current=i,c.current=Ni.to(e,{uProgress:1,duration:5,ease:`power1.inOut`,onComplete:()=>{e.uTexture1=p[i],e.uLightmask=m[i],e.uProgress=0,c.current=null}})}}),(0,Ix.jsx)(`mesh`,{ref:r,geometry:d,position:e?[0,b,0]:[0,.5,0],scale:e?[g,-g,g]:[g,g,g],rotation:[0,0,0],renderOrder:e?-1:2,children:(0,Ix.jsx)(`growMaterial`,{ref:n,uTexture1:p[0],uTexture2:p[0],uLightmask:m[0],uLightmaskNext:m[0],uProgress:0,uTime:0,uOpacity:1,uDarken:h,uOffset:_,uProjScale:v,uProjOffset:y,transparent:!e,depthWrite:!e})})}rC({FlowerMaterial:KT({uTexture:new oc,uProgress:0,uTime:0,uEmissiveBoost:.5,uOpacity:1,uDarken:1},`
     varying vec2 vUv;
     varying vec3 vPos;
     varying float vDepth;
@@ -4278,6 +4280,7 @@ No matching component was found for:
     uniform float uTime;
     uniform float uEmissiveBoost;
     uniform float uOpacity;
+    uniform float uDarken;
     varying vec2 vUv;
     varying vec3 vPos;
     varying float vDepth;
@@ -4295,6 +4298,8 @@ No matching component was found for:
 
       // brighten with emissive boost
       vec3 col = tex.rgb * diff + tex.rgb * uEmissiveBoost;
+
+      col *= uDarken;
 
       // when fully visible (progress = 0), just show the flowers
       if (uProgress < 0.001) {
@@ -4323,7 +4328,7 @@ No matching component was found for:
 
       gl_FragColor = vec4(col, alpha);
     }
-  `)});var YT={grass01:`/textures/flowers+grass03_edit_03_grass_edit_grass01_beauty.ktx2`,grass02:`/textures/flowers+grass03_edit_03_grass_edit_grass02_beauty.ktx2`,grass03:`/textures/flowers+grass03_edit_03_grass_edit_grass03_beauty.ktx2`,tempest01:`/textures/flowers+grass03_edit_03_flowers_edit_tempest01_beauty.ktx2`,tempest02:`/textures/flowers+grass03_edit_03_flowers_edit_tempest02_beauty.ktx2`,tempest03:`/textures/flowers+grass03_edit_03_flowers_edit_tempest03_beauty.ktx2`,daisy01:`/textures/flowers+grass03_edit_03_flowers_edit_daisy01_beauty.ktx2`,daisy02:`/textures/flowers+grass03_edit_03_flowers_edit_daisy02_beauty.ktx2`,daisy03:`/textures/flowers+grass03_edit_03_flowers_edit_daisy03_beauty.ktx2`};function XT({rockRef:e,reflection:t=!1}){let n=(0,B.useRef)(),r=(0,B.useRef)([]),i=VT(e=>e.assetBaseUrl),{scale:a,reflectionY:o}=GT(),s=i,c=(0,B.useRef)(0),l=(0,B.useRef)({value:1}),u=(0,B.useRef)(null),d=IS(iw,`${s}/models/flowers.glb`,e=>{let t=new aT;t.setDecoderPath(`https://www.gstatic.com/draco/versioned/decoders/1.5.7/`),e.setDRACOLoader(t)}),{gl:f}=jS(),p=IS(kT,Object.values(YT).map(e=>`${s}${e}`),e=>{e.setTranscoderPath(`https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/basis/`),e.detectSupport(f)}),m=(0,B.useMemo)(()=>{let e={};return Object.keys(YT).forEach((t,n)=>{p[n].flipY=!1,p[n].needsUpdate=!0,e[t]=p[n]}),e},[p]),h=(0,B.useMemo)(()=>{let e=[];return d.scene.updateMatrixWorld(!0),d.scene.traverse(t=>{if(t.isMesh&&YT[t.name]){let n=t.geometry.clone();n.applyMatrix4(t.matrixWorld),e.push({name:t.name,geometry:n})}}),e},[d]);MS(({clock:t})=>{e?.current&&n.current&&(n.current.rotation.y=e.current.rotation.y);let i=VT.getState().activeIndex;if(c.current!==i){u.current&&u.current.kill(),c.current=i;let e=i===1;u.current=Ni.to(l.current,{value:e?0:1,duration:5,ease:`power1.inOut`,onComplete:()=>{u.current=null}})}n.current&&(n.current.visible=l.current.value<.99),r.current.forEach(e=>{e&&(e.uProgress=l.current.value,e.uTime=t.getElapsedTime())})});let g=t?o:.5,_=t?-a:a,v=t?.25:1;return(0,Ix.jsx)(`group`,{ref:n,position:[0,g,0],scale:[a,_,a],children:h.map((e,n)=>(0,Ix.jsx)(`mesh`,{geometry:e.geometry,renderOrder:t?0:3,children:(0,Ix.jsx)(`flowerMaterial`,{ref:e=>r.current[n]=e,uTexture:m[e.name],uEmissiveBoost:t?.2:.5,uOpacity:v,transparent:!0,depthWrite:!1})},e.name))})}rC({MistMaterial:KT({uTime:0,uOpacity:.35,uColor:new Y(`#205A74`)},`
+  `)});var YT={grass01:`/textures/flowers+grass03_edit_03_grass_edit_grass01_beauty.ktx2`,grass02:`/textures/flowers+grass03_edit_03_grass_edit_grass02_beauty.ktx2`,grass03:`/textures/flowers+grass03_edit_03_grass_edit_grass03_beauty.ktx2`,tempest01:`/textures/flowers+grass03_edit_03_flowers_edit_tempest01_beauty.ktx2`,tempest02:`/textures/flowers+grass03_edit_03_flowers_edit_tempest02_beauty.ktx2`,tempest03:`/textures/flowers+grass03_edit_03_flowers_edit_tempest03_beauty.ktx2`,daisy01:`/textures/flowers+grass03_edit_03_flowers_edit_daisy01_beauty.ktx2`,daisy02:`/textures/flowers+grass03_edit_03_flowers_edit_daisy02_beauty.ktx2`,daisy03:`/textures/flowers+grass03_edit_03_flowers_edit_daisy03_beauty.ktx2`};function XT({rockRef:e,reflection:t=!1}){let n=(0,B.useRef)(),r=(0,B.useRef)([]),i=VT(e=>e.assetBaseUrl),{scale:a,reflectionY:o}=GT(),s=i,c=(0,B.useRef)(0),l=(0,B.useRef)({value:1}),u=(0,B.useRef)(null),d=IS(iw,`${s}/models/flowers.glb`,e=>{let t=new aT;t.setDecoderPath(`https://www.gstatic.com/draco/versioned/decoders/1.5.7/`),e.setDRACOLoader(t)}),{gl:f}=jS(),p=IS(kT,Object.values(YT).map(e=>`${s}${e}`),e=>{e.setTranscoderPath(`https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/basis/`),e.detectSupport(f)}),m=(0,B.useMemo)(()=>{let e={};return Object.keys(YT).forEach((t,n)=>{p[n].flipY=!1,p[n].needsUpdate=!0,e[t]=p[n]}),e},[p]),h=(0,B.useMemo)(()=>{let e=[];return d.scene.updateMatrixWorld(!0),d.scene.traverse(t=>{if(t.isMesh&&YT[t.name]){let n=t.geometry.clone();n.applyMatrix4(t.matrixWorld),e.push({name:t.name,geometry:n})}}),e},[d]);MS(({clock:t})=>{e?.current&&n.current&&(n.current.rotation.y=e.current.rotation.y);let i=VT.getState().activeIndex;if(c.current!==i){u.current&&u.current.kill(),c.current=i;let e=i===1;u.current=Ni.to(l.current,{value:e?0:1,duration:5,ease:`power1.inOut`,onComplete:()=>{u.current=null}})}n.current&&(n.current.visible=l.current.value<.99),r.current.forEach(e=>{e&&(e.uProgress=l.current.value,e.uTime=t.getElapsedTime())})});let g=t?o:.5,_=t?-a:a,v=t?.25:1;return(0,Ix.jsx)(`group`,{ref:n,position:[0,g,0],scale:[a,_,a],children:h.map((e,n)=>(0,Ix.jsx)(`mesh`,{geometry:e.geometry,renderOrder:t?-1:3,children:(0,Ix.jsx)(`flowerMaterial`,{ref:e=>r.current[n]=e,uTexture:m[e.name],uEmissiveBoost:t?.2:.5,uOpacity:1,uDarken:v,transparent:!t,depthWrite:!1})},e.name))})}rC({MistMaterial:KT({uTime:0,uOpacity:.35,uColor:new Y(`#205A74`)},`
     varying vec2 vUv;
     void main() {
       vUv = uv;

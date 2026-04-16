@@ -10,6 +10,7 @@ const FlowerMaterial = shaderMaterial(
     uTime: 0,
     uEmissiveBoost: 0.5,
     uOpacity: 1,
+    uDarken: 1.0,
   },
   // vertex
   `
@@ -35,6 +36,7 @@ const FlowerMaterial = shaderMaterial(
     uniform float uTime;
     uniform float uEmissiveBoost;
     uniform float uOpacity;
+    uniform float uDarken;
     varying vec2 vUv;
     varying vec3 vPos;
     varying float vDepth;
@@ -52,6 +54,8 @@ const FlowerMaterial = shaderMaterial(
 
       // brighten with emissive boost
       vec3 col = tex.rgb * diff + tex.rgb * uEmissiveBoost;
+
+      col *= uDarken;
 
       // when fully visible (progress = 0), just show the flowers
       if (uProgress < 0.001) {

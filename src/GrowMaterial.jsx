@@ -15,6 +15,7 @@ const GrowMaterial = shaderMaterial(
     uOffset: new THREE.Vector3(0, 0, 0),
     uProjScale: 0.4,
     uProjOffset: new THREE.Vector2(0.4, 0.65),
+    uDarken: 1.0,
   },
   // vertex
   `
@@ -51,6 +52,7 @@ const GrowMaterial = shaderMaterial(
     uniform vec3 uOffset;
     uniform float uProjScale;
     uniform vec2 uProjOffset;
+    uniform float uDarken;
     varying vec2 vUv;
     varying vec3 vPos;
     varying float vDepth;
@@ -96,8 +98,8 @@ const GrowMaterial = shaderMaterial(
       if (uProgress < 0.001) {
         vec4 lm = texture2D(uLightmask, projUv);
         lm.rgb *= smoothstep(0.0, 0.4, facing);
-        vec3 lit = t1.rgb * diffuse + vec3(rim);
-        gl_FragColor = vec4(lit + lm.rgb, t1.a * uOpacity);
+        vec3 lit = (t1.rgb * diffuse + vec3(rim) + lm.rgb) * uDarken;
+        gl_FragColor = vec4(lit, t1.a * uOpacity);
         return;
       }
 
@@ -146,6 +148,7 @@ const GrowMaterial = shaderMaterial(
       color.rgb += glowColor * edgeGlow * 0.6 * fadeIn;
       color.rgb += lm.rgb;
 
+      color.rgb *= uDarken;
       color.a *= uOpacity;
       gl_FragColor = color;
     }
