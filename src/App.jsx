@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { PerformanceMonitor } from "@react-three/drei";
 import Rock from "./Rock";
 import Flowers from "./Flowers";
 import Environment from "./Environment";
@@ -76,15 +77,22 @@ function SceneGroup({ children }) {
 
 function App() {
   const rockMeshRef = useRef();
+  const [dpr, setDpr] = useState(1.5);
 
   return (
     <div id="app">
       <Canvas
-        dpr={[1, 1.5]}
+        dpr={[1, dpr]}
         camera={{ position: [0, 0, 6], fov: 50 }}
         gl={{ alpha: true }}
         style={{ background: "transparent" }}
       >
+        <PerformanceMonitor
+          onIncline={() => setDpr(1.5)}
+          onDecline={() => setDpr(1)}
+          flipflops={3}
+          onFallback={() => setDpr(1)}
+        />
         <CameraRig />
         <ambientLight intensity={1.5} />
         <directionalLight position={[5, 5, 5]} intensity={2} />

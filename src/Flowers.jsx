@@ -91,6 +91,11 @@ export default function Flowers({ rockRef, reflection = false }) {
       });
     }
 
+    // Hide group when fully dissolved — skip draw calls entirely
+    if (groupRef.current) {
+      groupRef.current.visible = progressRef.current.value < 0.99;
+    }
+
     materialsRef.current.forEach((mat) => {
       if (mat) {
         mat.uProgress = progressRef.current.value;

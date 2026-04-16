@@ -87,42 +87,38 @@ const GrowMaterial = shaderMaterial(
       float diffuse = 0.4 + diff1 * 0.8 + diff2 * 0.4 + diff3 * 0.3;
       float lighting = diffuse + rim;
 
-      // --- lightmask projection with glitch ---
+      // --- lightmask projection ---
       vec3 localWorldPos = vWorldPos - uOffset;
       vec2 projUv = vec2(localWorldPos.x, -localWorldPos.y) * uProjScale + uProjOffset;
+      float facing = max(0.0, N.z);
 
-      // glitch: random horizontal shifts per scanline
+      // fast path: no transition — skip glitch, noise, and second texture
+      if (uProgress < 0.001) {
+        vec4 lm = texture2D(uLightmask, projUv);
+        lm.rgb *= smoothstep(0.0, 0.4, facing);
+        vec3 lit = t1.rgb * diffuse + vec3(rim);
+        gl_FragColor = vec4(lit + lm.rgb, t1.a * uOpacity);
+        return;
+      }
+
+      // glitch: random horizontal shifts per scanline (only during transition)
       float scanline = floor(projUv.y * 40.0);
       float glitchRand = fract(sin(scanline * 43.7 + floor(uTime * 30.0) * 17.3) * 4375.5);
       float glitchStrength = smoothstep(0.7, 1.0, glitchRand);
 
-      // intense glitch during transition
-      float transitionGlitch = uProgress * (1.0 - uProgress) * 4.0; // peaks at 0.5
+      float transitionGlitch = uProgress * (1.0 - uProgress) * 4.0;
       glitchStrength *= transitionGlitch * 6.0;
 
       vec2 glitchedUv = projUv;
       glitchedUv.x += glitchStrength * 0.06 * (glitchRand - 0.5);
 
-      // sample both current and next projection
       vec4 lmCurrent = texture2D(uLightmask, glitchedUv);
       vec4 lmNext = texture2D(uLightmaskNext, glitchedUv);
-
-      // hard snap between projections mid-transition
       vec4 lm = mix(lmCurrent, lmNext, step(0.5, uProgress));
 
-      // heavy flicker during transition — projection cutting in and out
       float flicker = 1.0 - transitionGlitch * step(0.6, glitchRand);
-
-      float facing = max(0.0, N.z);
       float attenuation = smoothstep(0.0, 0.4, facing) * flicker;
       lm.rgb *= attenuation;
-
-      // hard cutoff: show nothing of texture2 when progress is 0
-      if (uProgress < 0.001) {
-        vec3 lit = t1.rgb * diffuse + vec3(rim);
-        gl_FragColor = vec4(lit + lm.rgb, t1.a * uOpacity);
-        return;
-      }
 
       // directional spread: starts from face closest to camera, crawls to back
       float directional = vDepth; // 0 = facing camera, 1 = away
