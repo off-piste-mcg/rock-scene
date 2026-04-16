@@ -69,9 +69,9 @@ export default function Rock({ reflection = false, meshRefOut }) {
       gsap.to(introProgress.current, {
         opacity: 1,
         z: 0,
-        duration: 1.5,
-        ease: "power2.out",
-        delay: 0.3,
+        duration: 3.5,
+        ease: "power3.out",
+        delay: 0.5,
       });
     }
   }, []);

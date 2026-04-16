@@ -12,7 +12,7 @@ function CloudSprite({ position, scale, speed, introDelay = 0 }) {
     gsap.to(intro.current, {
       scale: 1,
       opacity: 1,
-      duration: 2,
+      duration: 3,
       ease: "power2.out",
       delay: introDelay,
     });
@@ -46,9 +46,9 @@ function WindSprite({ x, startY, z, speed, scale, delay, drift }) {
   useMemo(() => {
     gsap.to(intro.current, {
       opacity: 1,
-      duration: 2,
+      duration: 3,
       ease: "power2.out",
-      delay: 1.5,
+      delay: 3,
     });
   }, []);
 
@@ -96,19 +96,19 @@ function smoothstep(min, max, value) {
 export default function Environment() {
   // cloud sprites clustered around the rock base
   const clouds = useMemo(() => [
-    // near the rock — wispy fog (appear shortly after rock)
-    { position: [0, -1.8, 0.5], scale: [4, 2.5, 1], speed: 1.0, introDelay: 0.8 },
-    { position: [-1.2, -2.0, 0.8], scale: [3.5, 2, 1], speed: 0.8, introDelay: 1.0 },
-    { position: [1.5, -1.9, 0.3], scale: [3, 2, 1], speed: 1.2, introDelay: 0.9 },
-    { position: [0.3, -2.1, -0.5], scale: [3.5, 2.5, 1], speed: 0.9, introDelay: 1.1 },
-    { position: [-0.8, -1.7, 1.0], scale: [2.5, 1.8, 1], speed: 1.1, introDelay: 1.0 },
+    // near the rock — wispy fog (appear after rock starts showing)
+    { position: [0, -1.8, 0.5], scale: [4, 2.5, 1], speed: 1.0, introDelay: 1.8 },
+    { position: [-1.2, -2.0, 0.8], scale: [3.5, 2, 1], speed: 0.8, introDelay: 2.2 },
+    { position: [1.5, -1.9, 0.3], scale: [3, 2, 1], speed: 1.2, introDelay: 2.0 },
+    { position: [0.3, -2.1, -0.5], scale: [3.5, 2.5, 1], speed: 0.9, introDelay: 2.4 },
+    { position: [-0.8, -1.7, 1.0], scale: [2.5, 1.8, 1], speed: 1.1, introDelay: 2.1 },
 
-    // bottom fog layer — wider, bloom in a bit later
-    { position: [0, -2.5, 0], scale: [9, 2.5, 1], speed: 0.6, introDelay: 1.2 },
-    { position: [-3, -2.6, -1], scale: [7, 2, 1], speed: 0.5, introDelay: 1.4 },
-    { position: [3, -2.6, -1], scale: [7, 2, 1], speed: 0.7, introDelay: 1.3 },
-    { position: [0, -2.7, -0.5], scale: [8, 2, 1], speed: 0.45, introDelay: 1.5 },
-    { position: [-1.5, -2.5, 0.5], scale: [6, 1.8, 1], speed: 0.55, introDelay: 1.4 },
+    // bottom fog layer — wider, bloom in later
+    { position: [0, -2.5, 0], scale: [9, 2.5, 1], speed: 0.6, introDelay: 2.6 },
+    { position: [-3, -2.6, -1], scale: [7, 2, 1], speed: 0.5, introDelay: 3.0 },
+    { position: [3, -2.6, -1], scale: [7, 2, 1], speed: 0.7, introDelay: 2.8 },
+    { position: [0, -2.7, -0.5], scale: [8, 2, 1], speed: 0.45, introDelay: 3.2 },
+    { position: [-1.5, -2.5, 0.5], scale: [6, 1.8, 1], speed: 0.55, introDelay: 3.0 },
   ], []);
 
   // wind wisps rising vertically with gentle curved drift
