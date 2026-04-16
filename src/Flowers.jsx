@@ -29,7 +29,7 @@ export default function Flowers({ rockRef, reflection = false }) {
   const base = assetBaseUrl;
   const prevIndex = useRef(0);
   const progressRef = useRef({ value: 1 }); // start dissolved (entrance is not Info)
-  const transitioning = useRef(false);
+  const activeTween = useRef(null);
 
   const gltf = useLoader(GLTFLoader, `${base}/models/flowers.glb`, (loader) => {
     const draco = new DRACOLoader();
@@ -71,17 +71,18 @@ export default function Flowers({ rockRef, reflection = false }) {
     const currentIndex = useStore.getState().activeIndex;
 
     // Trigger transition when activeIndex changes
-    if (prevIndex.current !== currentIndex && !transitioning.current) {
-      transitioning.current = true;
+    if (prevIndex.current !== currentIndex) {
+      if (activeTween.current) activeTween.current.kill();
+
+      prevIndex.current = currentIndex;
       const shouldShow = currentIndex === 1; // only on Info rock
 
-      gsap.to(progressRef.current, {
+      activeTween.current = gsap.to(progressRef.current, {
         value: shouldShow ? 0 : 1,
         duration: 5,
         ease: "power1.inOut",
         onComplete: () => {
-          prevIndex.current = currentIndex;
-          transitioning.current = false;
+          activeTween.current = null;
         },
       });
     }

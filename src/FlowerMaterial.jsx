@@ -66,12 +66,13 @@ const FlowerMaterial = shaderMaterial(
       float spread = uProgress * 1.3 + 0.1;
       float dissolve = smoothstep(spread - 0.02, spread + 0.02, threshold);
 
-      // edge glow
+      // edge glow — fade in smoothly at start
       float edgeDist = abs(threshold - spread);
-      float edgeGlow = smoothstep(0.06, 0.0, edgeDist) * step(uProgress, 0.99);
+      float fadeIn = smoothstep(0.0, 0.08, uProgress);
+      float edgeGlow = smoothstep(0.06, 0.0, edgeDist) * step(uProgress, 0.99) * fadeIn;
       vec3 glowColor = vec3(0.0, 0.16, 0.69);
 
-      col += glowColor * edgeGlow * 0.6;
+      col += glowColor * edgeGlow * 0.6 * fadeIn;
 
       // discard dissolved pixels
       float alpha = tex.a * dissolve * uOpacity;

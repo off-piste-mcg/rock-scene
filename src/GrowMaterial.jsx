@@ -135,14 +135,15 @@ const GrowMaterial = shaderMaterial(
       // organic edge
       float mask = 1.0 - smoothstep(spread - 0.02, spread + 0.02, threshold);
 
-      // infected edge glow
+      // infected edge glow — fade in smoothly at start
       float edgeDist = abs(threshold - spread);
-      float edgeGlow = smoothstep(0.06, 0.0, edgeDist) * step(uProgress, 0.99);
+      float fadeIn = smoothstep(0.0, 0.08, uProgress);
+      float edgeGlow = smoothstep(0.06, 0.0, edgeDist) * step(uProgress, 0.99) * fadeIn;
       vec3 glowColor = vec3(0.0, 0.16, 0.69);
 
       vec4 color = mix(t1, t2, mask);
       color.rgb = color.rgb * diffuse + vec3(rim);
-      color.rgb += glowColor * edgeGlow * 0.6;
+      color.rgb += glowColor * edgeGlow * 0.6 * fadeIn;
       color.rgb += lm.rgb;
 
       color.a *= uOpacity;

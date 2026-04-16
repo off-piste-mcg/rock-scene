@@ -4244,20 +4244,21 @@ No matching component was found for:
       // organic edge
       float mask = 1.0 - smoothstep(spread - 0.02, spread + 0.02, threshold);
 
-      // infected edge glow
+      // infected edge glow — fade in smoothly at start
       float edgeDist = abs(threshold - spread);
-      float edgeGlow = smoothstep(0.06, 0.0, edgeDist) * step(uProgress, 0.99);
+      float fadeIn = smoothstep(0.0, 0.08, uProgress);
+      float edgeGlow = smoothstep(0.06, 0.0, edgeDist) * step(uProgress, 0.99) * fadeIn;
       vec3 glowColor = vec3(0.0, 0.16, 0.69);
 
       vec4 color = mix(t1, t2, mask);
       color.rgb = color.rgb * diffuse + vec3(rim);
-      color.rgb += glowColor * edgeGlow * 0.6;
+      color.rgb += glowColor * edgeGlow * 0.6 * fadeIn;
       color.rgb += lm.rgb;
 
       color.a *= uOpacity;
       gl_FragColor = color;
     }
-  `)});function ST({reflection:e=!1,meshRefOut:t}){let n=(0,v.useRef)(),r=(0,v.useRef)(),{activeIndex:i,rocks:a,assetBaseUrl:o}=sb(),s=(0,v.useRef)(i),c=(0,v.useRef)(!1),l=o,u=D_(ny,`${l}/models/rock.glb`,e=>{let t=new rb;t.setDecoderPath(`https://www.gstatic.com/draco/versioned/decoders/1.5.7/`),e.setDRACOLoader(t)}),d=null;u.scene.updateMatrixWorld(!0),u.scene.traverse(e=>{e.isMesh&&!d&&(d=e.geometry.clone(),d.applyMatrix4(e.matrixWorld))});let f=Qv(a.map(e=>`${l}${e.texture}`));f.forEach(e=>{e.flipY=!1,e.needsUpdate=!0});let p=Qv(a.map(e=>`${l}${e.projection}`)),m=e?.25:1,{scale:h,offset:g}=db(),_=(0,v.useRef)(h);return _.current=h,C_(({clock:a})=>{let o=r.current,l=_.current;if(o.scale.x+=(l-o.scale.x)*.05,o.scale.y+=((e?-l:l)-o.scale.y)*.05,o.scale.z+=(l-o.scale.z)*.05,o.rotation.y+=.003,t&&(t.current=o),n.current.uTime=a.getElapsedTime(),s.current!==i&&!c.current){c.current=!0;let e=n.current;e.uTexture2=f[i],e.uLightmaskNext=p[i],e.uProgress=0,bT.to(e,{uProgress:1,duration:5,ease:`power1.inOut`,onComplete:()=>{e.uTexture1=f[i],e.uLightmask=p[i],e.uProgress=0,s.current=i,c.current=!1}})}}),(0,Dg.jsx)(`mesh`,{ref:r,geometry:d,position:e?[0,-3.5,0]:[0,.5,0],scale:e?[h,-h,h]:[h,h,h],rotation:[0,0,0],renderOrder:e?0:2,children:(0,Dg.jsx)(`growMaterial`,{ref:n,uTexture1:f[0],uTexture2:f[0],uLightmask:p[0],uLightmaskNext:p[0],uProgress:0,uTime:0,uOpacity:m,uOffset:g,transparent:!0,depthWrite:!e})})}J_({FlowerMaterial:Xv({uTexture:new er,uProgress:0,uTime:0,uEmissiveBoost:.5,uOpacity:1},`
+  `)});function ST({reflection:e=!1,meshRefOut:t}){let n=(0,v.useRef)(),r=(0,v.useRef)(),{activeIndex:i,rocks:a,assetBaseUrl:o}=sb(),s=(0,v.useRef)(i),c=(0,v.useRef)(null),l=o,u=D_(ny,`${l}/models/rock.glb`,e=>{let t=new rb;t.setDecoderPath(`https://www.gstatic.com/draco/versioned/decoders/1.5.7/`),e.setDRACOLoader(t)}),d=(0,v.useMemo)(()=>{u.scene.updateMatrixWorld(!0);let e=null;return u.scene.traverse(t=>{t.isMesh&&!e&&(e=t.geometry.clone(),e.applyMatrix4(t.matrixWorld))}),e},[u]),f=Qv(a.map(e=>`${l}${e.texture}`));(0,v.useMemo)(()=>{f.forEach(e=>{e.flipY=!1,e.needsUpdate=!0})},[f]);let p=Qv(a.map(e=>`${l}${e.projection}`)),m=e?.25:1,{scale:h,offset:g}=db(),_=(0,v.useRef)(h);return _.current=h,C_(({clock:a})=>{let o=r.current,l=_.current;if(o.scale.x+=(l-o.scale.x)*.05,o.scale.y+=((e?-l:l)-o.scale.y)*.05,o.scale.z+=(l-o.scale.z)*.05,o.rotation.y+=.003,t&&(t.current=o),n.current.uTime=a.getElapsedTime(),s.current!==i){let e=n.current;c.current&&(c.current.kill(),e.uTexture1=f[s.current],e.uLightmask=p[s.current],e.uProgress=0),e.uTexture2=f[i],e.uLightmaskNext=p[i],e.uProgress=0,s.current=i,c.current=bT.to(e,{uProgress:1,duration:5,ease:`power1.inOut`,onComplete:()=>{e.uTexture1=f[i],e.uLightmask=p[i],e.uProgress=0,c.current=null}})}}),(0,Dg.jsx)(`mesh`,{ref:r,geometry:d,position:e?[0,-3.5,0]:[0,.5,0],scale:e?[h,-h,h]:[h,h,h],rotation:[0,0,0],renderOrder:e?0:2,children:(0,Dg.jsx)(`growMaterial`,{ref:n,uTexture1:f[0],uTexture2:f[0],uLightmask:p[0],uLightmaskNext:p[0],uProgress:0,uTime:0,uOpacity:m,uOffset:g,transparent:!0,depthWrite:!e})})}J_({FlowerMaterial:Xv({uTexture:new er,uProgress:0,uTime:0,uEmissiveBoost:.5,uOpacity:1},`
     varying vec2 vUv;
     varying vec3 vPos;
     varying float vDepth;
@@ -4309,12 +4310,13 @@ No matching component was found for:
       float spread = uProgress * 1.3 + 0.1;
       float dissolve = smoothstep(spread - 0.02, spread + 0.02, threshold);
 
-      // edge glow
+      // edge glow — fade in smoothly at start
       float edgeDist = abs(threshold - spread);
-      float edgeGlow = smoothstep(0.06, 0.0, edgeDist) * step(uProgress, 0.99);
+      float fadeIn = smoothstep(0.0, 0.08, uProgress);
+      float edgeGlow = smoothstep(0.06, 0.0, edgeDist) * step(uProgress, 0.99) * fadeIn;
       vec3 glowColor = vec3(0.0, 0.16, 0.69);
 
-      col += glowColor * edgeGlow * 0.6;
+      col += glowColor * edgeGlow * 0.6 * fadeIn;
 
       // discard dissolved pixels
       float alpha = tex.a * dissolve * uOpacity;
@@ -4322,7 +4324,7 @@ No matching component was found for:
 
       gl_FragColor = vec4(col, alpha);
     }
-  `)});var CT={grass01:`/textures/flowers+grass03_edit_03_grass_edit_grass01_beauty.png`,grass02:`/textures/flowers+grass03_edit_03_grass_edit_grass02_beauty.png`,grass03:`/textures/flowers+grass03_edit_03_grass_edit_grass03_beauty.png`,tempest01:`/textures/flowers+grass03_edit_03_flowers_edit_tempest01_beauty.png`,tempest02:`/textures/flowers+grass03_edit_03_flowers_edit_tempest02_beauty.png`,tempest03:`/textures/flowers+grass03_edit_03_flowers_edit_tempest03_beauty.png`,daisy01:`/textures/flowers+grass03_edit_03_flowers_edit_daisy01_beauty.png`,daisy02:`/textures/flowers+grass03_edit_03_flowers_edit_daisy02_beauty.png`,daisy03:`/textures/flowers+grass03_edit_03_flowers_edit_daisy03_beauty.png`};function wT({rockRef:e,reflection:t=!1}){let n=(0,v.useRef)(),r=(0,v.useRef)([]),{assetBaseUrl:i}=sb(),{scale:a}=db(),o=i,s=(0,v.useRef)(0),c=(0,v.useRef)({value:1}),l=(0,v.useRef)(!1),u=D_(ny,`${o}/models/flowers.glb`,e=>{let t=new rb;t.setDecoderPath(`https://www.gstatic.com/draco/versioned/decoders/1.5.7/`),e.setDRACOLoader(t)}),d=Qv(Object.values(CT).map(e=>`${o}${e}`)),f=(0,v.useMemo)(()=>{let e={};return Object.keys(CT).forEach((t,n)=>{d[n].flipY=!1,d[n].needsUpdate=!0,e[t]=d[n]}),e},[d]),p=(0,v.useMemo)(()=>{let e=[];return u.scene.updateMatrixWorld(!0),u.scene.traverse(t=>{if(t.isMesh&&CT[t.name]){let n=t.geometry.clone();n.applyMatrix4(t.matrixWorld),e.push({name:t.name,geometry:n})}}),e},[u]);C_(({clock:t})=>{e?.current&&n.current&&(n.current.rotation.y=e.current.rotation.y);let i=sb.getState().activeIndex;if(s.current!==i&&!l.current){l.current=!0;let e=i===1;bT.to(c.current,{value:e?0:1,duration:5,ease:`power1.inOut`,onComplete:()=>{s.current=i,l.current=!1}})}r.current.forEach(e=>{e&&(e.uProgress=c.current.value,e.uTime=t.getElapsedTime())})});let m=t?-3.5:.5,h=t?-a:a,g=t?.25:1;return(0,Dg.jsx)(`group`,{ref:n,position:[0,m,0],scale:[a,h,a],children:p.map((e,n)=>(0,Dg.jsx)(`mesh`,{geometry:e.geometry,renderOrder:t?0:3,children:(0,Dg.jsx)(`flowerMaterial`,{ref:e=>r.current[n]=e,uTexture:f[e.name],uEmissiveBoost:t?.2:.5,uOpacity:g,transparent:!0,depthWrite:!1})},e.name))})}J_({MistMaterial:Xv({uTime:0,uOpacity:.35,uColor:new G(`#205A74`)},`
+  `)});var CT={grass01:`/textures/flowers+grass03_edit_03_grass_edit_grass01_beauty.png`,grass02:`/textures/flowers+grass03_edit_03_grass_edit_grass02_beauty.png`,grass03:`/textures/flowers+grass03_edit_03_grass_edit_grass03_beauty.png`,tempest01:`/textures/flowers+grass03_edit_03_flowers_edit_tempest01_beauty.png`,tempest02:`/textures/flowers+grass03_edit_03_flowers_edit_tempest02_beauty.png`,tempest03:`/textures/flowers+grass03_edit_03_flowers_edit_tempest03_beauty.png`,daisy01:`/textures/flowers+grass03_edit_03_flowers_edit_daisy01_beauty.png`,daisy02:`/textures/flowers+grass03_edit_03_flowers_edit_daisy02_beauty.png`,daisy03:`/textures/flowers+grass03_edit_03_flowers_edit_daisy03_beauty.png`};function wT({rockRef:e,reflection:t=!1}){let n=(0,v.useRef)(),r=(0,v.useRef)([]),{assetBaseUrl:i}=sb(),{scale:a}=db(),o=i,s=(0,v.useRef)(0),c=(0,v.useRef)({value:1}),l=(0,v.useRef)(null),u=D_(ny,`${o}/models/flowers.glb`,e=>{let t=new rb;t.setDecoderPath(`https://www.gstatic.com/draco/versioned/decoders/1.5.7/`),e.setDRACOLoader(t)}),d=Qv(Object.values(CT).map(e=>`${o}${e}`)),f=(0,v.useMemo)(()=>{let e={};return Object.keys(CT).forEach((t,n)=>{d[n].flipY=!1,d[n].needsUpdate=!0,e[t]=d[n]}),e},[d]),p=(0,v.useMemo)(()=>{let e=[];return u.scene.updateMatrixWorld(!0),u.scene.traverse(t=>{if(t.isMesh&&CT[t.name]){let n=t.geometry.clone();n.applyMatrix4(t.matrixWorld),e.push({name:t.name,geometry:n})}}),e},[u]);C_(({clock:t})=>{e?.current&&n.current&&(n.current.rotation.y=e.current.rotation.y);let i=sb.getState().activeIndex;if(s.current!==i){l.current&&l.current.kill(),s.current=i;let e=i===1;l.current=bT.to(c.current,{value:e?0:1,duration:5,ease:`power1.inOut`,onComplete:()=>{l.current=null}})}r.current.forEach(e=>{e&&(e.uProgress=c.current.value,e.uTime=t.getElapsedTime())})});let m=t?-3.5:.5,h=t?-a:a,g=t?.25:1;return(0,Dg.jsx)(`group`,{ref:n,position:[0,m,0],scale:[a,h,a],children:p.map((e,n)=>(0,Dg.jsx)(`mesh`,{geometry:e.geometry,renderOrder:t?0:3,children:(0,Dg.jsx)(`flowerMaterial`,{ref:e=>r.current[n]=e,uTexture:f[e.name],uEmissiveBoost:t?.2:.5,uOpacity:g,transparent:!0,depthWrite:!1})},e.name))})}J_({MistMaterial:Xv({uTime:0,uOpacity:.35,uColor:new G(`#6BA0D8`)},`
     varying vec2 vUv;
     void main() {
       vUv = uv;

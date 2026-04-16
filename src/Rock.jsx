@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -13,7 +13,7 @@ export default function Rock({ reflection = false, meshRefOut }) {
   const meshRef = useRef();
   const { activeIndex, rocks, assetBaseUrl } = useStore();
   const prevIndex = useRef(activeIndex);
-  const transitioning = useRef(false);
+  const activeTween = useRef(null);
 
   const base = assetBaseUrl;
   const gltf = useLoader(GLTFLoader, `${base}/models/rock.glb`, (loader) => {
@@ -21,21 +21,26 @@ export default function Rock({ reflection = false, meshRefOut }) {
     draco.setDecoderPath("https://www.gstatic.com/draco/versioned/decoders/1.5.7/");
     loader.setDRACOLoader(draco);
   });
-  let geometry = null;
-  gltf.scene.updateMatrixWorld(true);
-  gltf.scene.traverse((child) => {
-    if (child.isMesh && !geometry) {
-      geometry = child.geometry.clone();
-      geometry.applyMatrix4(child.matrixWorld);
-    }
-  });
+  const geometry = useMemo(() => {
+    gltf.scene.updateMatrixWorld(true);
+    let geo = null;
+    gltf.scene.traverse((child) => {
+      if (child.isMesh && !geo) {
+        geo = child.geometry.clone();
+        geo.applyMatrix4(child.matrixWorld);
+      }
+    });
+    return geo;
+  }, [gltf]);
 
   // Load all rock textures upfront
   const allTextures = useTexture(rocks.map((r) => `${base}${r.texture}`));
-  allTextures.forEach((t) => {
-    t.flipY = false;
-    t.needsUpdate = true;
-  });
+  useMemo(() => {
+    allTextures.forEach((t) => {
+      t.flipY = false;
+      t.needsUpdate = true;
+    });
+  }, [allTextures]);
 
   // Load all projections upfront
   const allProjections = useTexture(rocks.map((r) => `${base}${r.projection}`));
@@ -58,14 +63,22 @@ export default function Rock({ reflection = false, meshRefOut }) {
     if (meshRefOut) meshRefOut.current = mesh;
     matRef.current.uTime = clock.getElapsedTime();
 
-    if (prevIndex.current !== activeIndex && !transitioning.current) {
-      transitioning.current = true;
+    if (prevIndex.current !== activeIndex) {
       const mat = matRef.current;
+
+      if (activeTween.current) {
+        activeTween.current.kill();
+        mat.uTexture1 = allTextures[prevIndex.current];
+        mat.uLightmask = allProjections[prevIndex.current];
+        mat.uProgress = 0;
+      }
+
       mat.uTexture2 = allTextures[activeIndex];
       mat.uLightmaskNext = allProjections[activeIndex];
       mat.uProgress = 0;
+      prevIndex.current = activeIndex;
 
-      gsap.to(mat, {
+      activeTween.current = gsap.to(mat, {
         uProgress: 1,
         duration: 5,
         ease: "power1.inOut",
@@ -73,8 +86,7 @@ export default function Rock({ reflection = false, meshRefOut }) {
           mat.uTexture1 = allTextures[activeIndex];
           mat.uLightmask = allProjections[activeIndex];
           mat.uProgress = 0;
-          prevIndex.current = activeIndex;
-          transitioning.current = false;
+          activeTween.current = null;
         },
       });
     }
