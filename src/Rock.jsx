@@ -56,7 +56,7 @@ export default function Rock({ reflection = false, meshRefOut }) {
   });
 
   const baseOpacity = reflection ? 0.25 : 1;
-  const { scale: rScale, offset } = useResponsive();
+  const { scale: rScale, offset, projScale, projOffset } = useResponsive();
   const targetScale = useRef(rScale);
   targetScale.current = rScale;
 
@@ -141,6 +141,8 @@ export default function Rock({ reflection = false, meshRefOut }) {
         uTime={0}
         uOpacity={baseOpacity}
         uOffset={offset}
+        uProjScale={projScale}
+        uProjOffset={projOffset}
         transparent
         depthWrite={!reflection}
       />

@@ -37,6 +37,8 @@ function interpolate(breakpoints, width) {
     scale: lerp(a.scale, b.scale, t),
     cameraZ: lerp(a.cameraZ, b.cameraZ, t),
     offset: lerpArray(a.offset, b.offset, t),
+    projScale: lerp(a.projScale, b.projScale, t),
+    projOffset: lerpArray(a.projOffset, b.projOffset, t),
   };
 }
 

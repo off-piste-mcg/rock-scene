@@ -13,6 +13,8 @@ const GrowMaterial = shaderMaterial(
     uOpacity: 1,
     uTime: 0,
     uOffset: new THREE.Vector3(0, 0, 0),
+    uProjScale: 0.4,
+    uProjOffset: new THREE.Vector2(0.4, 0.65),
   },
   // vertex
   `
@@ -47,6 +49,8 @@ const GrowMaterial = shaderMaterial(
     uniform float uOpacity;
     uniform float uTime;
     uniform vec3 uOffset;
+    uniform float uProjScale;
+    uniform vec2 uProjOffset;
     varying vec2 vUv;
     varying vec3 vPos;
     varying float vDepth;
@@ -85,7 +89,7 @@ const GrowMaterial = shaderMaterial(
 
       // --- lightmask projection with glitch ---
       vec3 localWorldPos = vWorldPos - uOffset;
-      vec2 projUv = vec2(localWorldPos.x, -localWorldPos.y) * 0.4 + vec2(0.4, 0.65);
+      vec2 projUv = vec2(localWorldPos.x, -localWorldPos.y) * uProjScale + uProjOffset;
 
       // glitch: random horizontal shifts per scanline
       float scanline = floor(projUv.y * 40.0);
