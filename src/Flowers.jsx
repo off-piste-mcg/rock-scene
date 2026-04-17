@@ -25,7 +25,8 @@ export default function Flowers({ rockRef, reflection = false }) {
   const groupRef = useRef();
   const materialsRef = useRef([]);
   const assetBaseUrl = useStore((s) => s.assetBaseUrl);
-  const { scale: rScale, reflectionY } = useResponsive();
+  const rocks = useStore((s) => s.rocks);
+  const { scale: rScale, reflectionY, offset } = useResponsive();
   const base = assetBaseUrl;
   const prevIndex = useRef(0);
   const progressRef = useRef({ value: 1 }); // start dissolved (entrance is not Info)
@@ -43,6 +44,16 @@ export default function Flowers({ rockRef, reflection = false }) {
     loader.setTranscoderPath("https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/basis/");
     loader.detectSupport(gl);
   });
+  // Reuse the Info rock's projection on the flowers so the text lands on top.
+  // useLoader caches by URL, so no double download — Rock already loaded this.
+  const infoProjection = useLoader(
+    KTX2Loader,
+    `${base}${rocks[1].projection}`,
+    (loader) => {
+      loader.setTranscoderPath("https://cdn.jsdelivr.net/gh/pmndrs/drei-assets@master/basis/");
+      loader.detectSupport(gl);
+    }
+  );
   const textureMap = useMemo(() => {
     const map = {};
     const keys = Object.keys(MESH_TEXTURES);
@@ -104,25 +115,58 @@ export default function Flowers({ rockRef, reflection = false }) {
     });
   });
 
+  // Overall bush size. Lower = smaller and automatically denser (duplicates
+  // cluster tighter). Higher = bigger, spreads further up the rock.
+  const FLOWER_SCALE = 1.0;
+
+  // Duplicate each mesh to densify the bush. Each entry = one copy.
+  // rotY (radians) = angular offset around rock Y-axis; tight = keeps
+  // duplicates on the same side of the rock.
+  // radial < 1 pulls duplicates inward toward the rock's vertical axis —
+  // compensates for the rock not being a perfect cylinder, so rotated
+  // duplicates sink into the surface instead of floating in air.
+  // yOffset = small vertical variance.
+  const DUPES = [
+    { rotY: 0.0,  yOffset: 0.0,    radial: 1.0  },
+    { rotY: -0.07, yOffset: 0.02,  radial: 0.96 },
+    { rotY: 0.07,  yOffset: -0.015, radial: 0.96 },
+  ];
+
   const yPos = reflection ? reflectionY : 0.5;
-  const yScale = reflection ? -rScale : rScale;
+  const sx = rScale * FLOWER_SCALE;
+  const sy = (reflection ? -rScale : rScale) * FLOWER_SCALE;
   const darken = reflection ? 0.25 : 1;
 
   return (
-    <group ref={groupRef} position={[0, yPos, 0]} scale={[rScale, yScale, rScale]}>
-      {meshes.map((m, i) => (
-        <mesh key={m.name} geometry={m.geometry} renderOrder={reflection ? -1 : 3}>
-          <flowerMaterial
-            ref={(el) => (materialsRef.current[i] = el)}
-            uTexture={textureMap[m.name]}
-            uEmissiveBoost={reflection ? 0.2 : 0.5}
-            uOpacity={1}
-            uDarken={darken}
-            transparent={!reflection}
-            depthWrite={false}
-          />
-        </mesh>
-      ))}
+    <group ref={groupRef} position={[0, yPos, 0]} scale={[sx, sy, sx]}>
+      {meshes.map((m, i) =>
+        DUPES.map((d, j) => {
+          const flatIndex = i * DUPES.length + j;
+          return (
+            <mesh
+              key={`${m.name}-${j}`}
+              geometry={m.geometry}
+              rotation={[0, d.rotY, 0]}
+              position={[0, d.yOffset, 0]}
+              scale={[d.radial, 1, d.radial]}
+              renderOrder={reflection ? -1 : 3}
+            >
+              <flowerMaterial
+                ref={(el) => (materialsRef.current[flatIndex] = el)}
+                uTexture={textureMap[m.name]}
+                uLightmask={infoProjection}
+                uLightmaskNext={infoProjection}
+                uOffset={offset}
+                uEmissiveBoost={reflection ? 0.4 : 1.0}
+                uOpacity={1}
+                uDarken={darken}
+                transparent={!reflection}
+                depthWrite={reflection}
+              />
+            </mesh>
+          );
+        })
+      )}
     </group>
   );
 }

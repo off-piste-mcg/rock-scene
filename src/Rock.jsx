@@ -151,7 +151,7 @@ export default function Rock({ reflection = false, meshRefOut }) {
         uProjScale={projScale}
         uProjOffset={projOffset}
         transparent={!reflection}
-        depthWrite={!reflection}
+        depthWrite={true}
       />
     </mesh>
   );

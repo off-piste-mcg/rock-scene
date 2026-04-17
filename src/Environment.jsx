@@ -33,6 +33,7 @@ function CloudSprite({ position, scale, speed, introDelay = 0 }) {
         ref={matRef}
         transparent
         depthWrite={false}
+        depthTest={false}
       />
     </mesh>
   );
@@ -84,6 +85,7 @@ function WindSprite({ x, startY, z, speed, scale, delay, drift }) {
         ref={matRef}
         transparent
         depthWrite={false}
+        depthTest={false}
       />
     </mesh>
   );
