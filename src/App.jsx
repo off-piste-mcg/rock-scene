@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import Rock from "./Rock";
 import Flowers from "./Flowers";
 import Environment from "./Environment";
+import { PerfProbe, PerfOverlay, isPerfEnabled } from "./Perf";
 import { useStore } from "./store";
 import { useResponsive } from "./useResponsive";
 import "./App.css";
@@ -86,6 +87,7 @@ function App() {
         style={{ background: "transparent" }}
       >
         <CameraRig />
+        {isPerfEnabled && <PerfProbe />}
         <ambientLight intensity={1.5} />
         <directionalLight position={[5, 5, 5]} intensity={2} />
         <directionalLight position={[-5, 3, -5]} intensity={1} />
@@ -99,6 +101,7 @@ function App() {
       </Canvas>
       <NavListener />
       {isDev && <DevButtons />}
+      {isPerfEnabled && <PerfOverlay />}
     </div>
   );
 }
