@@ -13,9 +13,8 @@ const GrowMaterial = shaderMaterial(
     uOpacity: 1,
     uTime: 0,
     uOffset: new THREE.Vector3(0, 0, 0),
-    uProjScale: 0.4,
-    uProjOffset: new THREE.Vector2(0.4, 0.65),
-    uDarken: 1.0,
+    uBrightness1: 1.0,
+    uBrightness2: 1.0,
   },
   // vertex
   `
@@ -50,9 +49,8 @@ const GrowMaterial = shaderMaterial(
     uniform float uOpacity;
     uniform float uTime;
     uniform vec3 uOffset;
-    uniform float uProjScale;
-    uniform vec2 uProjOffset;
-    uniform float uDarken;
+    uniform float uBrightness1;
+    uniform float uBrightness2;
     varying vec2 vUv;
     varying vec3 vPos;
     varying float vDepth;
@@ -86,43 +84,57 @@ const GrowMaterial = shaderMaterial(
       float rim = 1.0 - max(0.0, dot(N, viewDir));
       rim = pow(rim, 2.5) * 0.5;
 
-      float diffuse = 0.4 + diff1 * 0.8 + diff2 * 0.4 + diff3 * 0.3;
+      // specular highlight (Blinn-Phong, aligned with key light)
+      // tweak: shininess = tightness of highlight; strength = intensity
+      vec3 halfVec = normalize(lightDir1 + viewDir);
+      float spec = pow(max(0.0, dot(N, halfVec)), 64.0) * 0.35;
+      // extra gloss at glancing angles (wet-rock feel)
+      float fresnel = pow(1.0 - max(0.0, dot(N, viewDir)), 3.0);
+      spec += fresnel * 0.15;
+
+      float rawDiffuse = 0.4 + diff1 * 0.8 + diff2 * 0.4 + diff3 * 0.3;
+      // Textures are beauty passes (lighting baked in). Blend shader diffuse
+      // toward 1.0 so the baked lighting shows through. Lower = more of our
+      // shader lighting, higher = more of the artist's baked look.
+      float diffuse = mix(rawDiffuse, 1.0, 0.2);
       float lighting = diffuse + rim;
 
-      // --- lightmask projection ---
+      // --- lightmask projection with glitch ---
       vec3 localWorldPos = vWorldPos - uOffset;
-      vec2 projUv = vec2(localWorldPos.x, -localWorldPos.y) * uProjScale + uProjOffset;
-      float facing = max(0.0, N.z);
+      vec2 projUv = vec2(localWorldPos.x, -localWorldPos.y) * 0.4 + vec2(0.4, 0.65);
 
-      // fast path: no transition — skip glitch, noise, and second texture
-      if (uProgress < 0.001) {
-        vec4 lm = texture2D(uLightmask, projUv);
-        lm.rgb *= smoothstep(0.0, 0.4, facing);
-        vec3 lit = (t1.rgb * diffuse + vec3(rim) + lm.rgb) * uDarken;
-        gl_FragColor = vec4(lit, t1.a * uOpacity);
-        return;
-      }
-
-      // glitch: random horizontal shifts per scanline (only during transition)
+      // glitch: random horizontal shifts per scanline
       float scanline = floor(projUv.y * 40.0);
       float glitchRand = fract(sin(scanline * 43.7 + floor(uTime * 30.0) * 17.3) * 4375.5);
       float glitchStrength = smoothstep(0.7, 1.0, glitchRand);
 
-      // glitch early in the transition (0.1 - 0.4)
-      float glitchWindow = smoothstep(0.05, 0.15, uProgress) * (1.0 - smoothstep(0.35, 0.45, uProgress));
-      float transitionGlitch = glitchWindow * 4.0;
+      // intense glitch during transition
+      float transitionGlitch = uProgress * (1.0 - uProgress) * 4.0; // peaks at 0.5
       glitchStrength *= transitionGlitch * 6.0;
 
       vec2 glitchedUv = projUv;
       glitchedUv.x += glitchStrength * 0.06 * (glitchRand - 0.5);
 
+      // sample both current and next projection
       vec4 lmCurrent = texture2D(uLightmask, glitchedUv);
       vec4 lmNext = texture2D(uLightmaskNext, glitchedUv);
+
+      // hard snap between projections mid-transition
       vec4 lm = mix(lmCurrent, lmNext, step(0.5, uProgress));
 
+      // heavy flicker during transition — projection cutting in and out
       float flicker = 1.0 - transitionGlitch * step(0.6, glitchRand);
+
+      float facing = max(0.0, N.z);
       float attenuation = smoothstep(0.0, 0.4, facing) * flicker;
       lm.rgb *= attenuation;
+
+      // hard cutoff: show nothing of texture2 when progress is 0
+      if (uProgress < 0.001) {
+        vec3 lit = t1.rgb * uBrightness1 * diffuse + vec3(rim + spec);
+        gl_FragColor = vec4(lit + lm.rgb, t1.a * uOpacity);
+        return;
+      }
 
       // directional spread: starts from face closest to camera, crawls to back
       float directional = vDepth; // 0 = facing camera, 1 = away
@@ -146,11 +158,11 @@ const GrowMaterial = shaderMaterial(
       vec3 glowColor = vec3(0.0, 0.16, 0.69);
 
       vec4 color = mix(t1, t2, mask);
-      color.rgb = color.rgb * diffuse + vec3(rim);
+      float brightness = mix(uBrightness1, uBrightness2, mask);
+      color.rgb = color.rgb * brightness * diffuse + vec3(rim + spec);
       color.rgb += glowColor * edgeGlow * 0.6 * fadeIn;
       color.rgb += lm.rgb;
 
-      color.rgb *= uDarken;
       color.a *= uOpacity;
       gl_FragColor = color;
     }

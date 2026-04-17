@@ -1,25 +1,31 @@
 import { create } from "zustand";
 
+// brightness: per-rock albedo multiplier (1.0 = unchanged). Tweak to dial
+// individual rocks lighter/darker without re-exporting textures.
 const rocks = [
   {
     label: "Entrance",
     texture: "/textures/entrance_beauty_2.ktx2",
     projection: "/textures/entrance_projection.ktx2",
+    brightness: 1.0,
   },
   {
     label: "Info",
     texture: "/textures/rock1_beauty_2.ktx2",
     projection: "/textures/rock1_projection.ktx2",
+    brightness: 1.15,
   },
   {
     label: "What we offer",
     texture: "/textures/rock2_beauty_2.ktx2",
     projection: "/textures/rock2_projection.ktx2",
+    brightness: 1.0,
   },
   {
     label: "Go off-piste",
     texture: "/textures/rock2_beauty_2.ktx2",
     projection: "/textures/rock2_projection.ktx2",
+    brightness: 1.0,
   },
 ];
 

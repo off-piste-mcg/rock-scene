@@ -101,11 +101,13 @@ export default function Rock({ reflection = false, meshRefOut }) {
         activeTween.current.kill();
         mat.uTexture1 = allTextures[prevIndex.current];
         mat.uLightmask = allProjections[prevIndex.current];
+        mat.uBrightness1 = rocks[prevIndex.current].brightness ?? 1.0;
         mat.uProgress = 0;
       }
 
       mat.uTexture2 = allTextures[activeIndex];
       mat.uLightmaskNext = allProjections[activeIndex];
+      mat.uBrightness2 = rocks[activeIndex].brightness ?? 1.0;
       mat.uProgress = 0;
       prevIndex.current = activeIndex;
 
@@ -116,6 +118,7 @@ export default function Rock({ reflection = false, meshRefOut }) {
         onComplete: () => {
           mat.uTexture1 = allTextures[activeIndex];
           mat.uLightmask = allProjections[activeIndex];
+          mat.uBrightness1 = rocks[activeIndex].brightness ?? 1.0;
           mat.uProgress = 0;
           activeTween.current = null;
         },
@@ -138,6 +141,8 @@ export default function Rock({ reflection = false, meshRefOut }) {
         uTexture2={allTextures[0]}
         uLightmask={allProjections[0]}
         uLightmaskNext={allProjections[0]}
+        uBrightness1={rocks[0].brightness ?? 1.0}
+        uBrightness2={rocks[0].brightness ?? 1.0}
         uProgress={0}
         uTime={0}
         uOpacity={baseOpacity}
